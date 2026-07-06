@@ -1,52 +1,47 @@
-# 메모 + 블로그 사이드 프로젝트
+# My Blog — React 학습용 사이드 프로젝트
 
-React + Spring Boot 기반 개인 학습용 프로젝트. 프론트엔드 학습에 비중을 두고, Claude Code / Cursor 등 AI 도구를 활용한 개발(바이브 코딩)도 함께 연습.
+메모 + 블로그 형태의 웹앱을 만들며 React를 기초부터 익히는 프로젝트.
+백엔드 구현 없이 프론트엔드 학습에 집중하는 구조로 구성.
 
 ## 기술 스택
 
 ### Frontend
-- React 19 + Vite + TypeScript
-- React Router v6
-- TanStack Query v5 (서버 상태)
-- Zustand (클라이언트 상태)
-- Tailwind CSS
-- React Hook Form + Zod
-- @uiw/react-md-editor (마크다운 에디터)
-- vite-plugin-pwa (PWA)
+| 영역 | 기술 |
+|---|---|
+| 코어 | React 19 + Vite + TypeScript |
+| 라우팅 | React Router |
+| HTTP 통신 | axios |
+| 스타일 | Tailwind CSS |
 
-### Backend
-- Spring Boot 3.x + Java 17
-- Spring Data JPA
-- Spring Security + JWT
-- Swagger (OpenAPI)
-- PostgreSQL
-- Spring AI (요약/태그 추천 등 AI 기능)
+### Backend (BaaS)
+| 영역 | 기술 |
+|---|---|
+| DB / API / 인증 | Supabase (PostgreSQL) |
 
 ### 배포
-- Frontend: Vercel
-- Backend: Railway
+| 영역 | 서비스 |
+|---|---|
+| 프론트엔드 | Vercel |
+
+### 개발 도구
+| 도구 | 용도 |
+|---|---|
+| Claude Code | 설계, 디버깅, 코드 리뷰 |
+| Cursor | 반복 코드 생성 |
+
+> TanStack Query, Zustand 등의 라이브러리는 처음부터 도입하지 않고,
+> 직접 불편함을 겪은 뒤 필요할 때 단계적으로 추가한다.
+ 
  
 
-## Backend 설정
+## 학습 로드맵
 
-### 사전 준비
-- JDK 17 이상 설치 필요
-  ```bash
-  java -version
-  ```
+- [ ] **1. React 기본기** — 컴포넌트, props, useState, 리스트 렌더링(map), useEffect
+  - 더미 데이터로 카드 목록 렌더링부터 시작
+- [ ] **2. React Router** — 목록 / 상세 / 작성 페이지 나누기
+- [ ] **3. Supabase 연동** — 진짜 DB로 CRUD (조회 / 작성 / 수정 / 삭제)
+- [ ] **4. 인증** — Supabase Auth로 로그인 / 회원가입
+- [ ] **5. 리팩토링** — TanStack Query 도입해 데이터 페칭 개선
+- [ ] **6. 배포** — Vercel 배포 + 환경변수 설정
 
-### 프로젝트 생성
-- Spring Initializr (start.spring.io) 또는 Claude Code로 생성
-- 설정값:
-  - Project: Gradle 또는 Maven
-  - Language: Java
-  - Packaging: **Jar**
-  - Java: 21
-  - Dependencies: Spring Web, Spring Data JPA, Spring Security, PostgreSQL Driver, Lombok
-
-
-## 개발 도구
-
-- **Claude Code**: 아키텍처 설계, 디버깅, 코드 리뷰
-- **Cursor**: 반복적인 CRUD 보일러플레이트 생성
-- **Spring AI**: 서비스 내 AI 기능 구현 (요약, 태그 추천 등)
+ 
