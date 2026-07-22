@@ -90,6 +90,138 @@ import './index.css'
 // setInterval(tick, 1000);
 
 // 4. 컴포넌트와 props
+/* 
+    component는 UI를 독립적이고 재사용 가능한 조각으로 나누는 방법입니다.
+    컴포넌트를 정의하는 가장 간단한 방법은 함수형 컴포넌트를 사용하는 것입니다.
+*/
+// function Welcome(props: { name: string }) {
+//   return <h1>Hello, {props.name}</h1>;
+// }
+
+// 컴포넌트 렌더링
+/* 
+  이전까지는 Dom 태그만을 이용해 React 엘리먼트를 만들었지만, ex const element = <div />;
+  React 엘리먼트는 사용자 저의 컴포넌트로도 나타낼수 있다 ex const element = <Welcome name="Sara" />;
+  react가 사용자 정의 컴포넌트로 작성한 엘리먼트를 발견하면 JSX 어트리뷰트와 자식을 해당컴포넌트에 단일객체로 전달한다
+  이 객체를 props라고 부른다. props는 읽기 전용이며, 컴포넌트는 전달받은 props를 변경할 수 없다.
+  여기서 props는 <Welcome name="Sara" />에서 name="Sara" 부분을 의미
+  즉, 하나의 Welcome 컴포넌트를 만들고, name이라는 Prop을 전달하여 각기 다른 결과를 렌더링할 수 있습니다. 이를 통해 코드의 재사용성이 획기적으로 향상
+*/
+// 렌더링 예시
+// const root = ReactDOM.createRoot(document.getElementById('root')!);
+// root.render(<Welcome name="Sara" />);
+
+// 컴포넌트 합성
+/* 
+    컴포넌트는 자신의 출력에 다른 컴포넌트를 참도 가능
+    이는 모든 세부단계에서 동일한 추상 컴포넌트 사용할수있다
+    React 앱에서는 버튼, 폼, 다이얼로그, 화면 등의 모든 것들이 흔히 컴포넌트로 표현
+*/
+// function Welcome(props: { name: String}) {
+//   return <h1>Hello, {props.name}</h1>
+// }
+
+// // App 컴포넌트에 Welcome 컴포넌트를 여러 번 사용하여 다양한 이름을 전달하고, 각기 다른 인사말을 렌더링합니다.
+// function App() {
+//   return (
+//     <div>
+//       <Welcome name="Sara" />
+//       <Welcome name="Tom" />
+//       <Welcome name="Wine" />
+//       <Welcome name="Blue" />
+//     </div>
+//   )
+// }
+
+// // document.getElementById('root')!에 !붙이는 이유?
+// const root = ReactDOM.createRoot(document.getElementById('root')!);
+// root.render(<App/>)
+
+// 컴포넌트 추출
+
+// Comment 컴포넌트를 보면 구성요소들이 모두 중첩 구조로 이루어져 있어서 변경하기 어렵다. 
+// 각 구성요소를 개별적으로 재사용하기도 힘들다. 이 컴포넌트에서 몇가지 컴포넌트를 추출하겠다.
+// function Comment(props) {
+//   return (
+//     <div className="Comment">
+//       <UserInfo user = {props.author} />
+//       {/* <div className="UserInfo">
+//         < Avatar props = {props.author} /> 
+//           props가 아니라 props.author를 전달해야함. props는 읽기 전용이므로 props.author를 전달해야함
+//           Avatar 컴포넌트 추출
+//           <img className="Avatar"
+//             src={props.author.avatarUrl}
+//             alt={props.author.name}
+//           /> 
+//         <div className="UserInfo-name">
+//           {props.author.name}
+//         </div>
+//       </div> */}
+//       <div className="Comment-text">
+//         {props.text}
+//       </div>
+//       <div className="Comment-date">
+//         {formatDate(props.date)}
+//       </div>
+//     </div>
+//   )
+// }
+
+// // Avatar 컴포넌트 추출
+// function Avatar(props) {
+//   return (
+//     <img className="Avatar"
+//           src={props.user.avatarUrl} // Avatar가 렌더링된다는거를 알 필요 없기 때문에 일반화된 user을 대신 사용
+//           alt={props.user.name}
+//         />
+//   )
+// }
+
+// // UserInfo 컴포넌트 추출
+// function UserInfo(props){ 
+//   return (
+//     <div className="UserInfo">
+//       < Avatar props = {props.user} />
+//       <div className="UserInfo-name">
+//         {props.user.name}
+//       </div>
+//     </div>
+//   )
+// }
+
+// // props는 읽기 전용
+
+// /* 
+//   함수 컴포넌트나 클래스 컴포넌트 모두 컴포넌트 자체 props 수정 불가
+//   다음 함수의 경우 순수 함수라고 한다. 입력값을 수정하지 앖고 항상 동일한 입력값에 대해 동일한 출력값을 반환하는 함수이기 때문에
+// */
+// function sum(a, b) {
+//   return a + b;
+// }
+
+// // 반면 이 함수는 순수 함수가 아니다. 입력값을 수정하고, 동일한 입력값에 대해 다른 출력값을 반환할 수 있기 때문에
+// function withdraw(account, amount) {
+//   account.total -= amount;
+// }
+
+/* 
+  여기서 React는 중요한 규칙이 있다 
+  모든 React 컴포넌트는 자신의 props를 다룰 때 반드시 순수 함수처럼 동작해야 한다. 
+  즉, 컴포넌트는 전달받은 props를 수정하지 않고, 동일한 props에 대해 항상 동일한 UI를 렌더링해야 한다.
+  물론 애플리케이션UI는 동적이며 시간에 따라 변한다. 
+  이때 React는 컴포넌트의 상태(state)를 사용하여 UI를 동적으로 업데이트한다.
+  React 컴포넌트는 state를 통해 위 규칙을 위반하지 않고, 사용자 액션, 네트워크 응답 및 다른 요소에 
+  대한 응답으로 시간에 따라 자신의 값을 변경할 수 있다.
+*/
+
+// 5. state와 생명주기 - 목
 
 
-// 5. state와 생명주기
+// 6. 이벤트 처리하기 - 목
+
+
+// 7. 조건부 렌더링 - 목
+
+// 9 ~ 12 토
+
+// 정리 일
