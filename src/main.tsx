@@ -1,4 +1,4 @@
-import { StrictMode, createElement } from 'react'
+import React, { StrictMode, createElement } from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 // import App from './App.tsx'
@@ -214,14 +214,290 @@ import './index.css'
   대한 응답으로 시간에 따라 자신의 값을 변경할 수 있다.
 */
 
-// 5. state와 생명주기 - 목
+// 5. state와 생명주기  
 
+// Clock이 타이머를 설정하고 매초 UI를 업데이트하지만, 이는 타이머를 설정해서 가능한 것. 
+// 그러나, 스스로 업뎃하도로 해야함
+// const root = ReactDOM.createRoot(document.getElementById('root'))
 
-// 6. 이벤트 처리하기 - 목
+// function Clock(props){
+//   return (
+//     <div>
+//       <h1>Hi</h1>
+//       <h2>Time : {props.date.toLocaleTimeString()}</h2>
+//     </div>
+//   )
+// }
 
+// function tick(){
+//   root.render(<Clock date={new Date()}/>)
+// }
 
-// 7. 조건부 렌더링 - 목
+// setInterval(tick, 1000)
 
-// 9 ~ 12 토
+// 함수에서 클래스로 변환하기
+// React.Component 를 통해 함수 컴포넌트를 클래스로 변환 가능
 
-// 정리 일
+// class Clock extends React.Component {
+//   render() {
+//     return (
+//       <div>
+//         <h1>Hi</h1>
+//         <h2>Time : {this.props.date.toLocaleTimeString()}</h2>
+//       </div>
+//     )
+//   }
+// }
+
+/* 
+  render 메서드는 업데이트가 발생할때마다 호출되지만, 같은 DOM노드로  <Clock />을 렌더링하는 경우 Clock 클래스의 단일 인스턴스만 사용됨
+  즉, 화면이 계속 바뀌어도 React는 그 컴포넌트를 부수고 다시 새로 만드는것이 아니라 기ㅏ존에 만들어둔것을 재사용한다는 의미
+  React가 컴포넌트 인스턴스(실체)를 파괴하지 않고 하나만 계속 유지해주기 때문에, 우리가 state와 생명주기 기능 같은 것을 마음놓고 사용할 수 있다
+*/
+
+// 클래스에 로컬 state 추가
+/* <Clock />가 root.render()로 전달되었을 때 React는 Clock 컴포넌트의 constructor를 호출합니다. Clock이 현재 시각을 표시해야 하기 때문에 현재 시각이 포함된 객체로 this.state를 초기화합니다. 나중에 이 state를 업데이트할 것입니다.
+React는 Clock 컴포넌트의 render() 메서드를 호출합니다. 이를 통해 React는 화면에 표시되어야 할 내용을 알게 됩니다. 그 다음 React는 Clock의 렌더링 출력값을 일치시키기 위해 DOM을 업데이트합니다.
+Clock 출력값이 DOM에 삽입되면, React는 componentDidMount() 생명주기 메서드를 호출합니다. 그 안에서 Clock 컴포넌트는 매초 컴포넌트의 tick() 메서드를 호출하기 위한 타이머를 설정하도록 브라우저에 요청합니다.
+매초 브라우저가 tick() 메서드를 호출합니다. 그 안에서 Clock 컴포넌트는 setState()에 현재 시각을 포함하는 객체를 호출하면서 UI 업데이트를 진행합니다. setState() 호출 덕분에 React는 state가 변경된 것을 인지하고 화면에 표시될 내용을 알아내기 위해 render() 메서드를 다시 호출합니다. 이 때 render() 메서드 안의 this.state.date가 달라지고 렌더링 출력값은 업데이트된 시각을 포함합니다. React는 이에 따라 DOM을 업데이트합니다.
+Clock 컴포넌트가 DOM으로부터 한 번이라도 삭제된 적이 있다면 React는 타이머를 멈추기 위해 componentWillUnmount() 생명주기 메서드를 호출합니다 */
+class Clock extends React.Component {
+  // 클래스 컴포넌트는 항상 props로 기본 constructor를 호출해야함
+  constructor(props) { 
+    super(props);
+    this.state = {date: new Date()};
+  }
+
+  // Clock이 처음 DOM에 렌더링될때마다 타이머 설정. 이를 REact에서는 마운팅이라고 함
+  // 또한 생성 DOM이 삭제될때마다 타이머 해제. 이를 언마운팅이라고함
+  // 이러한 메서드들은 생명주기 메서드라고 함
+  componentDidMount() {
+    this.timerID = setInterval(
+      () => this.tick(),
+      1000
+    )
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID)
+  }
+
+  // 매초 작동하는 함수
+  tick() {
+    this.setState({ // 컴포넌트 로컬 state를 업뎃하기위해 사용
+      date: new Date()
+    })
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Hi</h1>
+        <h2>Time : {this.state.date.toLocaleTimeString()}</h2>
+      </div>
+    )
+  }
+}
+const root = ReactDOM.createRoot(document.getElementById('root'))
+root.render(<Clock />)
+
+// state 올바른 사용
+// 직접 수정 X ex, this.state.comment = '' < - x
+// this.setState({comment:''}) < - 0
+
+// state 업뎃은 비동기적일수 있음
+// React는 성능을 위해 여러 setState() 호출을 단일 업데이트로 한꺼번에 처리할 수 있음
+// this.props와 this.state가 비동기적으로 업데이트될 수 있기 때문에 다음 state를 계산할 때 해당 값에 의존해서는 안 됨
+// this.로 가져오지 말고, 직접 인자로 받아와야함
+/* // Wrong
+this.setState({
+  counter: this.state.counter + this.props.increment,
+});
+// Correct
+this.setState((state, props) => ({
+  counter: state.counter + props.increment
+}));
+
+ */
+
+// state 업뎃은 병합가능
+// setState()를 호출할 때 React는 제공한 객체를 현재 state로 병합
+
+/* 
+ constructor(props) {
+    super(props);
+    this.state = {
+      posts: [],
+      comments: []
+    };
+  }
+
+  // this.state을 통해 변수를 독립적으로 업뎃함
+  componentDidMount() {
+    fetchPosts().then(response => {
+      this.setState({
+        posts: response.posts
+      });
+    });
+
+    fetchComments().then(response => {
+      this.setState({
+        comments: response.comments
+      });
+    });
+  }
+    
+  그러나 병합은 얕게 이루어지기 때문에 this.setState({comments})는 
+ (setState 호출 시 전달한 객체와 기존 상태 객체를 얕게 병합(shallow merge) 
+  즉, 변경하려는 속성만 업데이트하고 나머지는 그대로 유지)
+  this.state.posts에 영향을 주진 않지만 this.state.comments는 완전히 대체
+
+    // 1. 처음 상태
+  this.state = { posts: [옛날글], comments: [옛날댓글] };
+
+  // 2. fetchPosts() 완료! ➔ posts만 바꿈
+  this.setState({ posts: [새글] });
+  // ➔ 결과: { posts: [새글], comments: [옛날댓글] } (comments는 영향 없음!)
+
+  // 3. fetchComments() 완료! ➔ comments만 바꿈
+  this.setState({ comments: [새댓글] });
+  // ➔ 결과: { posts: [새글], comments: [새댓글] } (posts는 영향 없음!)
+*/
+
+// 데이터는 아래로 흐른다
+//  “하향식(top-down)” 또는 “단방향식” 데이터 흐름 
+/* 
+<FormattedDate date={this.state.date} />
+1. 자식은 출처를 알지 못함 즉 date가 어디서 왔는지 모름 또한 알필요도 없음
+2. 모든 state는 항상 특정한 컴포넌트가 소유하고 있으며 그 state로부터 파생된 UI 또는 데이터는 오직 트리구조에서 자신의 “아래”에 있는 컴포넌트에만 영향을 마참
+3. 그렇기 때문에 컴포넌트간의ㅏ 완전한 독립성을 가짐 서로 전혀 간섭하지 않음
+function App() {
+  return (
+    <div>
+      <Clock />
+      <Clock />
+      <Clock />
+    </div>
+  );
+}
+  을 보면 Clock들간은 서로 영향을 주지 않음
+*/
+
+// 6. 이벤트 처리하기
+
+// React 엘리먼트에서 이벤트를 처리하는 방식은 DOM 엘리먼트에서 이벤트를 처리하는 방식과 매우 유사
+/* 
+  차이점
+  - React의 이벤트는 소문자 대신 캐멀 케이스(camelCase)를 사용합니다.
+  - JSX를 사용하여 문자열이 아닌 함수로 이벤트 핸들러를 전달
+
+  <button onClick={activateLasers}> // activateLasers() Html 버전
+    Activate Lasers
+  </button>
+*/
+
+// 또다른 차이ㅏ점 React에서는 false를 반환해도 기본 동작을 방지할 수 없음 preventDefault 명시적 호출 필요
+
+/* 
+<form onsubmit="console.log('You clicked submit.'); return false">
+  <button type="submit">Submit</button>
+</form>
+html은 return false 하지만 
+
+function Form() {
+  function handleSubmit(e) {
+    e.preventDefault(); // preventDefault 명시적 호출 필요
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+*/
+// 리스너 이벤트
+// React를 사용할 때 DOM 엘리먼트가 생성된 후 리스너를 추가하기 위해 addEventListener를 호출할 필요가 없습니다. 
+// // 대신, 엘리먼트가 처음 렌더링될 때 리스너를 제공하면 됩니다.
+
+/* 
+class Toggle extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {isToggleOn: true};
+
+    // 리스너를 제공
+    // 콜백에서 `this`가 작동하려면 아래와 같이 바인딩 해주어야 합니다.
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() { // 리스너
+    this.setState(prevState => ({
+      isToggleOn: !prevState.isToggleOn
+    }));
+  }
+
+  render() {
+    return (
+      <button onClick={this.handleClick}>//  JSX 콜백 안에서 this의 의미에 대해 주의
+        {this.state.isToggleOn ? 'ON' : 'OFF'}
+      </button>
+    );
+  }
+}
+*/
+
+//  JSX 콜백 안에서 this의 의미에 대해 주의
+/* 
+   JSX 콜백 안에서 this를 하였는데 이 this가 누구인지 모르기 때문에 undefined가 뜬다
+   그렇기 대뭉네 undefined문제를 해결하기위ㅏ해 총 3가지 방법이 있다
+
+   1. 생성자 강제 연결 : .bind()
+   constructor(props) {
+    super(props);
+    this.state = { isToggleOn: true };
+    // "handleClick 안의 this는 무조건 이 Toggle 클래스 자신이다!"라고 딱 못 박아둠
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  2. 클래스 필드 문법 사용
+  //  이 문법은 *실험적인* 문법
+  handleClick = () => {
+    this.setState(prevState => ({
+      isToggleOn: !prevState.isToggleOn
+    }));
+  };
+
+  3. render 안에서 화살표로 감싸기ㅏ (비추)
+  이 문법은 클래스가 랜더린될때마다 다른 콜백이 생성된다. 
+  문제는 없지만, 하위ㅏ 컴포넌트에 props로서 전달될때 그 컴포넌트들이 추가로 다시 렌더링하는 성능문제 발생
+  즉, 부모가 매번 다른 props를 줘서 안바껴도 될 자식이 바뀌는 문제 발생
+  그래ㅑ서 되도록 1,2번을 권장
+  <button onClick={() => this.handleClick()}>
+*/
+
+// 이벤트 핸들러에 인자 전달
+
+// 루트 내부에서는 이벤트 핸들러에 추가적인 매개변수를 전달하는것이 일반적
+// 이때 화살표 함수 혹은 bind를 사용
+
+/* 
+<button onClick={(e) => this.deleteRow(id, e)}>Delete Row</button>
+<button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
+
+두 경우 모두 React 이벤트를 나타내는 e 인자가 ID 뒤에 두 번째 인자로 전달ㅁ
+화살표 함수를 사용하면 명시적으로 인자를 전달해야 하지만 bind를 사용할 경우 추가 인자가 자동으로 전달
+
+this.deleteRow.bind(this, id) 에서 괄호 안의 값들은 역할
+첫 번째 this: 이건 함수에 전달되는 데이터가 아니라, "함수 내부의 this를 누구로 설정할 것인가"를 결정하는 자바스크립트의 규칙입니다. (인자로 전달되지 않고 소비됨!)
+두 번째 id: 이것부터가 함수로 들어가는 진짜 첫 번째 데이터(인자 1)가 됩니다!'
+그래ㅑ서 함수에서는 2번째 인자가 들어옴 . 명시하지 않아도 e는 자동으로 들어옴
+deleteRow(id, e) {
+  // 첫 번째 인자: id (값: 3)
+  // 두 번째 인자: e (클릭 이벤트 정보)
+}
+*/
+
+// 7. 조건부 렌더링
+
+// 8. 리스트와 key
