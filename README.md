@@ -15,37 +15,30 @@
 - Supabase (PostgreSQL — DB / API / 인증)
 
 ### 배포
-- Vercel
-
-### 개발 도구
-- Claude Code — 설계, 디버깅, 코드 리뷰
-- Cursor — 반복 코드 생성
-
-> TanStack Query, Zustand 등은 처음부터 도입하지 않고,
+- Vercel 
+ 
 > 직접 불편함을 겪은 뒤 필요할 때 단계적으로 추가한다.
 
 ## 학습 로드맵
 
-- [ ] React 기본개념 — 컴포넌트, props, useState, 리스트 렌더링(map), useEffect
-- [ ] React Router — 목록 / 상세 / 작성 페이지 나누기
-- [ ] Supabase 연동 — 진짜 DB로 CRUD
-- [ ] 인증 — Supabase Auth로 로그인 / 회원가입
-- [ ] 리팩토링 — TanStack Query 도입
-- [ ] 배포 — Vercel 배포 + 환경변수 설정
-- [ ] 딥하게 개발
-
-### Week Plan
-
-- 주중 : React 문서 따라서 작업
-  - 화 4-5, 수 6-7, 목 8-9, 금 10-12 + 공부한거 전부 정리
-- 주말 
-  - vite - react - type 초기 셋팅 이어서 (ex, prett...)
-  - 빌드 run 할때 터미널 창닫으면 사라짐
-  - Claude CLI, 플러그인 / 코파일럿 접목 사용
-  - 주중 의문인 내용 공부
+- [ ] React 공식 사이트 기본 개념
+- [ ] React 공식 사이트 자습서
+- [ ] React + CSS로 메인 페이지 만들기
+  - HTML / CSS 핵심 개념 — Flexbox, Grid, 반응형
+- [ ] Tailwind CSS로 스타일 변경
+  - 반응형 UI 적용  
+- [ ] React Router — 페이지 분리 및 확장
+- [ ] Supabase 연동 — CRUD 구현
+- [ ] Supabase Auth, RLS — 로그인과 사용자별 권한 추가
+- [ ] 로딩, 에러, 빈 데이터 화면 처리
+- [ ] TanStack Query — 서버 상태 관리 및 리팩토링
+- [ ] Vercel - 배포
+- [ ] Copilot 활용 — 코드 리뷰, 리팩토링, 테스트
 
 ## 핵심 기능
 
 - 글 목록 / 상세 조회
 - 글 작성 / 수정 / 삭제
 - 로그인 / 회원가입
+
+ 
