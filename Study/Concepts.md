@@ -30,7 +30,7 @@ StrictMode는 React 애플리케이션에서 사용되는 컴포넌트에 대해
 
 ## 2. 리액트 jsx(tsx) 문법
 
-JavaScript를 확장한 문법이기 때문에 JavaScript의 모든 기능이 포함 되어있다. 하지만, JSX안에 javascript 표현식을 사용할려면, 중괄호 {}를 사용해야 한다.
+JavaScript를 HTML을 더해서 확장한 문법이기 때문에 JavaScript의 모든 기능이 포함 되어있다. 하지만, JSX안에 javascript 표현식을 사용할려면, 중괄호 {}를 사용해야 한다.
 
 ```js
 const user = {
@@ -403,4 +403,127 @@ function App() {
 
 ## 6.이벤트 처리
 
-// 단원 끝내기 전까지는 메신저 X
+React 엘리먼트에서 이벤트를 처리하는 방식은 DOM 엘리먼트에서 이벤트를 처리하는 방식과 매우 유사하지만, 몇 가지 명확한 차이점이 존재한다.
+
+1. **캐멀 케이스(camelCase) 사용:** React의 이벤트 이름은 소문자(`onclick`) 대신 캐멀 케이스(`onClick`)를 사용한다.
+2. **함수 참조 전달:** JSX를 사용하여 문자열이 아닌 **함수 자체(참조)**를 이벤트 핸들러로 전달한다.
+
+```js
+// HTML
+<button onclick="activateLasers()">
+    Activate Lasers
+</button>
+
+// JSX
+<button onClick={activateLasers}> 
+    Activate Lasers
+</button>
+```
+
+만약 JSX에서 `onClick={activateLasers()}`처럼 괄호를 붙이면, 클릭 시 실행되는 게 아니라 컴포넌트가 렌더링되는 순간 함수가 즉시 실행된다.
+
+또한, HTML에서는 return false를 반환하여 기본 동작을 방지할 수 있었지만, React에서는 동작하지 않으므로 `e.preventDefault()`를 명시적으로 호출해야 한다.
+
+```js
+// HTML
+<form onsubmit="console.log('You clicked submit.'); return false">
+  <button type="submit">Submit</button>
+</form>
+
+// JSX
+function Form(){
+  function handleSubmit(e) {
+    e.preventDefault(); 
+  }
+  return (
+    <form onSubmit={handleSubmit}>
+        <button type="submit">Submit</button>
+    </form>
+  )
+}
+```
+
+### 리스너 이벤트
+
+React에서는 DOM 엘리먼트가 생성된 후 이벤트를 붙이기 위해 `addEventListener`를 직접 호출할 필요가 없다. 대신, 엘리먼트를 렌더링할 때 JSX 속성으로 이벤트 핸들러를 직접 전달해주면 된다. 
+
+```js
+class Toggle extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { isToggleOn: true };
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick() {
+        this.setState(prev => ({
+            isToggleOn: !prev.isToggleOn
+        }));
+    }
+
+    render() {
+        return (
+            <button onClick={this.handleClick}>
+                {this.state.isToggleOn ? 'ON' : 'OFF'}
+            </button>
+        )
+    }
+}
+```
+
+JavaScript 클래스 메서드는 기본적으로 this가 바인딩되어 있지 않다. 따라서 onClick={this.handleClick}처럼 뒤에 ()를 붙이지 않고 참조만 전달할 경우, 실제 클릭 이벤트가 발생할 때 함수 내부의 this가 undefined가 되는 문제가 발생한다. 이를 해결하는 방법은 크게 3가지가 있다.
+ 
+1. 생성자(constructor)에서 `.bind()` 처리 : 생성자 안에서 .bind(this)를 사용해 handleClick 내부의 this가 무조건 Toggle 클래스 인스턴스 자신을 가리키도록 강제로 고정한다.
+
+```js
+constructor(props) {
+    super(props);
+    this.state = { isToggleOn: true };
+    this.handleClick = this.handleClick.bind(this);
+}
+```
+
+2. 클래스 필드 문법 사용 : 메서드를 선언할 때 화살표 함수를 사용한다. 화살표 함수는 상위 스코프의 this를 자동으로 바인딩하므로, 생성자에서 일일이 .bind()를 작성하지 않아도 된다.
+
+```js
+handleClick = () => {
+    this.setState(prev => ({
+        isToggleOn: !prev.isToggleOn
+    }));
+}
+```
+
+3. render() 메서드 안에서 화살표 함수 사용 : JSX 전달부 안에서 직접 화살표 함수를 만드는 방법이다. 하지만 이 방식은 컴포넌트가 렌더링될 때마다 매번 새로운 콜백 함수가 생성된다. 이 콜백이 하위 컴포넌트에 prop으로 전달되는 경우, 매번 다른 prop으로 인식되어 하위 컴포넌트까지 불필요하게 리렌더링되는 성능 문제가 발생할 수 있다. 그렇기 때문에 권장하지 않는 방법이다.
+
+```js
+render() {
+    return (
+        <button onClick={() => this.handleClick()}>
+            {this.state.isToggleOn ? 'ON' : 'OFF'}
+        </button>
+    )
+}
+```
+
+### 이벤트 핸들러에 인자 전달
+
+루프 내부에서는 이벤트 핸들러에 ID 같은 추가적인 매개변수를 전달해야 하는 경우가 많다. 이때는 **화살표 함수**나 **`bind`** 메서드를 사용하여 인자를 전달한다. 
+
+```js
+// 1. 화살표 함수 사용
+<button onClick={(e) => this.deleteRow(id, e)}> Delete Row </button>
+
+// 2. Function.prototype.bind 사용
+<button onClick={this.deleteRow.bind(this, id)}> Delete Row </button>
+
+function deleteRow(id, e) {
+    // id: 전달받은 데이터 (첫 번째 인자)
+    // e : React 이벤트 객체 (두 번째 인자)
+}
+```
+
+두 방식 모두 React 이벤트 객체인 e가 두 번째 인자로 deleteRow 메서드에 동일하게 전달된다.
+- 화살표 함수: (e) => ...처럼 이벤트 객체 e를 받아서 deleteRow 내부로 명시적으로 넘겨주어야 한다.
+- bind 방식: 바인딩할 인자(id)만 지정해 두면, React의 이벤트 객체 e는 자동으로 가장 마지막 인자로 전달되므로 코드에 직접 작성할 필요가 없다.
+
+## 7. 조건부 렌더링
