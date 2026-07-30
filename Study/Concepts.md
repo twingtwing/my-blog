@@ -527,3 +527,399 @@ function deleteRow(id, e) {
 - bind 방식: 바인딩할 인자(id)만 지정해 두면, React의 이벤트 객체 e는 자동으로 가장 마지막 인자로 전달되므로 코드에 직접 작성할 필요가 없다.
 
 ## 7. 조건부 렌더링
+
+React에서는 원하는 동작을 캡슐화하는 컴포넌트를 만든 뒤, 애플리케이션의 상태에 따라 필요한 컴포넌트만 선택적으로 렌더링할 수 있다.
+
+React의 조건부 렌더링은 JavaScript의 조건 처리 방식과 동일하게 동작한다. 따라서 `if`문이나 조건부 연산자(삼항 연산자, `&&` 등)와 같은 JavaScript 연산자를 사용해 현재 상태를 나타내는 엘리먼트를 만들고, 상태에 따라 UI를 업데이트할 수 있다.
+
+```js
+function UserGreeting() {
+    return <h1>Welcome back!</h1>;
+}
+
+function GuestGreeting() {
+    return <h1>Please sign up.</h1>;
+}
+
+function Greeting(props) {
+    const isLoggedIn = props.isLoggedIn;
+    if (isLoggedIn) {
+        return <UserGreeting />;
+    }
+    return <GuestGreeting />;
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<Greeting isLoggedIn="{false}"/>);
+```
+
+이처럼 isLoggedIn prop의 값(true / false)에 따라 조건에 맞는 컴포넌트를 선택하여 화면에 보여줄 수 있다. 
+
+### 엘리먼트 변수
+
+React에서는 JSX 엘리먼트를 자바스크립트 변수에 할당해서 사용할 수 있다. 이를 이용하면 조건문(`if`)을 통해 필요한 엘리먼트를 미리 변수에 담아두고, `return`문 안에서는 해당 변수만 출력하는 방식으로 깔끔하게 조건부 렌더링을 구현할 수 있다.
+
+```js
+function LoginButton(props) {
+    return (
+        <button onClick={props.onClick}>
+            Login
+        </button>
+    )
+}
+
+function LogoutButton(props) {
+    return (
+        <button onClick={props.onClick}>
+            Logout
+        </button>
+    )
+} 
+
+class LoginControl extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleLoginClick = this.handleLoginClick.bind(this);
+        this.handleLogoutClick = this.handleLogoutClick.bind(this);
+        this.state = {isLoggedIn: false};
+    }
+
+    handleLoginClick() {
+        this.setState({isLoggedIn: true})
+    }
+
+    handleLogoutClick() {
+        this.setState({isLoggedIn: false})
+    }
+
+    render() {
+        const isLoggedIn = this.state.isLoggedIn;
+        let button;
+        if (isLoggedIn) {
+            button = <LogoutButton onClick={this.handleLogoutClick} />
+        } else {
+            button = <LoginButton onClick={this.handleLoginClick} />
+        }
+        return (
+            <div>
+                <Greeting isLoggedIn={isLoggedIn} />
+                {button}
+            </div>
+        )
+    }
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<LoginControl />);
+```
+
+이 방식을 사용하면 화면의 다른 영역은 그대로 유지하면서, 특정 UI 요소만 유연하게 교체할 수 있다.
+
+### 조건부 연산자
+
+#### 논리 연산자 (&&)
+
+JavaScript에서 `true && expression`은 항상 `expression`으로 평가되고, `false && expression`은 항상 `false`로 평가된다. 따라서 `&&` 뒤에 JSX 엘리먼트를 붙일 경우, 조건이 `true`일 때는 엘리먼트가 출력되지만, 조건이 `false`이면 React가 이를 무시하여 아무것도 출력되지 않는다.
+
+```js
+function Mailbox(props) {
+    const unreadMsgs = props.unreadMsgs;
+    return (
+        <div>
+            <h1>Hi!</h1>
+            {
+                unreadMsgs.length > 0 &&
+                <h2>
+                    You have {unreadMsgs.length} unread messages.
+                </h2>
+            }
+        </div>
+    )
+}
+
+const messages = ['React', 'Re: React', 'Re:Re: React'];
+const root = ReactDOM.createRoot(document.getElementById('root')!);
+root.render(<Mailbox unreadMsgs={messages}/>);
+```
+
+**⚠️ 주의: Falsy 값과 && 연산자의 함정**
+
+falsy && expression일 경우, 표현식 전체가 falsy 평가값 그대로 반환된다는 점에 주의해야 한다. JavaScript에는 8가지 falsy 값(false, null, undefined, 0, -0, 0n, NaN, '')이 존재하며, 이를 제외한 다른 모든 값은 truthy 값이다. 단, React에서 false, null, undefined 등은 화면에 렌더링하지 않으므로, falsy값을 반환해도 아무것도 출력되지 않는다.
+
+```js
+render (
+    const count = 0;
+    return (
+        <div>
+        {count && <h1>Messages: {count}</h1>}
+        </div>
+    );
+)
+```
+
+따라서 위 코드에서는 falsy 값인 숫자 0이 평가 결과로 그대로 반환되어, 화면에 <div>0</div>으로 출력된다. 이러한 문제를 방지하기 위해 && 연산자로 조건부 렌더링을 할 때는 조건식이 단순 숫자가 아닌 Boolean 값(true/false)을 반환하도록 작성해야 안전하다.
+
+#### 삼항 연산자 (condition ? true: false)
+
+인라인으로 if-else 구문을 표현하고 싶을 때는 삼항 연산자를 사용한다. 조건에 따라 보여줄 엘리먼트나 컴포넌트를 명확하게 교체할 수 있다. 
+
+```js
+class LogInfo extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleLoginClick = this.handleLoginClick.bind(this);
+        this.handleLogoutClick = this.handleLogoutClick.bind(this);
+        this.state = {isLoggedIn: false};
+    }
+
+    handleLoginClick() {
+        this.setState({isLoggedIn: true})
+    }
+
+    handleLogoutClick() {
+        this.setState({isLoggedIn: false})
+    }
+
+    render() {
+        const isLoggedIn = this.state.isLoggedIn
+        return (
+            <div>
+                {
+                    isLoggedIn
+                    ? <LogoutButton onClick={this.handleLogoutClick} />
+                    : <LoginButton onClick={this.handleLoginClick} />
+                }
+            </div>
+        )
+    }
+}
+```
+
+JavaScript와 마찬가지로 가독성이 좋은 방식을 선택해 사용하면 된다. 또한 조건이 너무 복잡해진다면, 해당 부분을 별도의 컴포넌트로 분리하는 것을 고려하기 좋은 타이밍이다.
+
+### 컴포넌트 렌더링 억제
+
+다른 컴포넌트에 의해 렌더링될 때, 조건에 따라 특정 컴포넌트 자체를 화면에 나타나지 않게 숨기고 싶을 때가 있다. 이때는 JSX 대신 **`null`을 반환**하면 해결할 수 있다. React는 `false`, `true`, `null`, `undefined` 값을 화면에 렌더링하지 않으므로, `null`을 반환하면 해당 컴포넌트는 UI에 아무것도 출력하지 않는다.
+
+```js
+function WarningBanner(props) {
+    if (!props.warn) {
+        return null;
+    }
+
+    return (
+        <div className="warning">
+            Warning!
+        </div>
+    );
+}
+
+class Page extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleToggleClick = this.handleToggleClick.bind(this);
+        this.state = { showWarning: true };
+    }
+
+    handleToggleClick() {
+        this.setState(prev => ({
+            showWarning: !prev.showWarning
+        }));
+    }
+
+    render() {
+        return (
+            <div>
+                <WarningBanner warn={this.state.showWarning} />
+                <button onClick={this.handleToggleClick}>
+                    {this.state.showWarning ? 'Hide' : 'Show'}
+                </button>
+            </div>
+        );
+    }
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<Page/>);
+```
+
+컴포넌트의 render() 메서드에서 null을 반환하더라도 컴포넌트의 생명주기 메서드 호출에는 아무런 영향을 주지 않는다. null을 반환하는 것은 그저 "화면에 그릴 결과물이 없다"고 알려주는 것일 뿐, React 내부의 렌더링 과정 자체는 정상 실행된 것이다. 따라서 화면에 UI가 그려졌는지 여부와 상관없이 componentDidUpdate와 같은 생명주기 메서드는 이전과 동일하게 계속 호출된다.
+
+## 8. 리스트와 key
+
+### 리스트
+
+JavaScript의 `map()` 함수를 사용하면 배열의 각 요소를 변환하여 새로운 배열을 반환할 수 있다. React에서 배열 데이터를 엘리먼트 리스트로 변환할 때도 이와 동일한 방식을 사용한다.
+
+```js
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map((number) => number * 2);
+console.log(doubled);
+```
+
+#### 다수의 컴포넌트 렌더링
+ 
+JSX에서는 중괄호 {} 안에 엘리먼트 배열을 직접 포함시킬 수 있다. map()을 이용해 JSX 엘리먼트 배열을 만든 뒤, 이를 <ul> 태그 안에 넣어 다수의 목록을 한 번에 렌더링할 수 있다.
+
+```js
+const numbers = [1, 2, 3, 4, 5];
+const listItems = numbers.map(number => 
+    <li>{number}</li>
+)
+const root = ReactDOM.createRoot(document.getElementById('root')!);
+root.render(<ul>{listItems}</ul>)
+```
+
+#### 기본 리스트 컴포넌트
+
+일반적으로는 리스트 렌더링 로직을 독립된 컴포넌트 내부로 리팩토링하여 사용한다.
+
+```js
+function NumberList(props){
+    const numbers = props.numbers;
+    const numList = numbers.map(number =>
+        <li>{number}</li>
+    )
+    return (
+        <ul>{numList}</ul>
+    )
+}
+
+const numbers = [1, 2, 3, 4, 5];
+const root = ReactDOM.createRoot(document.getElementById('root')!);
+root.render(<NumberList numbers={numbers} />)
+```
+
+위 예시 코드를 실행하면 정상적으로 화면에 숫자가 출력되지만, 개발자 도구 콘솔창에 리스트의 각 항목에 Key를 넣으라는 경고가 발생한다. React가 리스트의 각 항목을 구별하고 변경 사항을 효율적으로 추적하기 위해서는 각 리스트 항목에 고유한 key 속성을 부여해야 한다.
+
+### Key
+ 
+Key는 React가 리스트에서 어떤 항목을 변경, 추가 또는 삭제할지 식별하는 것을 돕는 고유한 식별자다. 엘리먼트에 안정적인 고유성을 부여하기 위해 배열 내부의 엘리먼트에 지정해야 한다.
+
+```js
+const listItemKeys = numbers.map(number =>
+    <li key={number.toString()}>
+        {number}
+    </li>
+)
+```
+
+Key를 선택하는 가장 좋은 방법은 리스트 항목 간에 고유하게 식별할 수 있는 문자열을 사용하는 것이다. 대부분의 경우 데이터의 고유 id를 Key로 사용한다. 
+
+```js
+const todoItems = todos.map(todo =>
+    <li key={todo.id}>
+        {todo.text}
+    </li>
+)
+```
+
+만약 렌더링할 항목에 대한 안정적인 ID가 없다면, 최후의 수단으로 배열의 index를 Key로 사용할 수 있다. 또한, 리스트 항목에 명시적으로 Key를 지정하지 않을 경우 React는 기본적으로 배열의 인덱스를 Key로 사용한다.
+
+```js
+const todoItems = todos.map((todo, index) =>
+    <li key={index}>
+        {todo.text}
+    </li>
+)
+```
+
+항목의 순서가 바뀔 수 있는 상황에서 Key로 인덱스를 사용하는 것은 권장하지 않는다. 인덱스를 Key로 쓰면 React가 엘리먼트를 잘못 인식하여 컴포넌트 내부의 state가 꼬이거나 불필요한 리렌더링이 일어나 성능이 저하되는 문제가 발생할 수 있기 때문이다. 
+
+#### key를 이용한 컴포넌트 추출
+
+Key는 주변 배열의 Context에서만 의미를 가진다. 즉, React는 배열을 순회하며 컴포넌트 리스트를 생성하는 그 위치에서 항목 간의 Key를 비교한다. 
+
+따라서 `ListItem`과 같이 별도의 컴포넌트를 추출할 경우, `ListItem` 내부의 `<li>` 태그에 Key를 부여하는 것이 아니라, 배열을 생성하는 `map()` 함수 내부의 `<ListItem />` 엘리먼트에 Key를 부여해야 한다.
+
+경험상(공식서에서) 되도록이면 `map()` 함수 호출 내부에서 바로 반환되는 최상위 엘리먼트에 Key를 지정하면 된다.
+
+```js
+function ListItem(props) {
+    const value = props.value
+    return (
+        <li>
+            {value}
+        </li>
+    )
+}
+
+function NumberList (props) {
+    const numbers = props.numbers;
+    const listNum = numbers.map(num =>
+        <ListItem key={num.toString()} value={num} />
+    )
+    return (
+        <ul>
+            {listNum}
+        </ul>
+    )
+}
+```
+
+#### Key의 고유성 범위
+
+Key는 배열 안의 **형제 엘리먼트 사이에서만 고유**하면 되며, 전체 범위에서까지 고유할 필요는 없다. 따라서 서로 다른 배열이라면 동일한 Key 값을 사용할 수 있다.
+
+```js
+function Blog(props) {
+    const sidebar = (
+        <ul>
+            {
+                props.posts.map(post =>
+                    <li key={post.id}>
+                        {post.title}
+                    </li>
+                )
+            }
+        </ul>
+    );
+    const content = props.posts.map(post =>
+        <div key={post.id}>
+            <h3>{post.title}</h3>
+            <p>{post.content}</p>
+        </div>
+    )
+    return (
+        <div>
+            {sidebar}
+            <hr/>
+            {content}
+        </div>
+    )
+}
+```
+
+sidebar와 content는 서로 다른 두 개의 배열이므로 동일한 post.id를 key로 사용해도 문제없다.
+
+React에서 key는 내부적으로 엘리먼트를 식별하기 위한 속성이므로, 자식 컴포넌트의 props로 전달되지 않는다. 컴포넌트 내부에서 Key로 사용한 데이터 값이 필요하다면, 별도의 이름으로 prop을 명시하여 전달해야 한다.
+
+```js
+const content = posts.map(post => 
+    <Post 
+        key={post.id}
+        id={post.id}
+        title={post.title} />
+)
+``` 
+
+#### JSX 내부에 map() 인라인으로 포함하기
+
+map() 결과를 별도의 변수에 담지 않고, JSX의 중괄호 {} 안에 직접 작성하면 코드가 훨씬 간결해진다.
+
+```js
+function NumberList(props) {
+    const numbers = props.numbers
+    return (
+        <ul>
+            {
+                numbers.map(number => 
+                    <ListItem key={number.toString()} value={number} />
+                )
+            }
+        </ul>
+    )
+}
+```
+
+JSX 인라인 map()은 코드를 줄여주지만, 로직이 복잡해지거나 중첩이 심해지면 가독성이 떨어질 수 있다. 이 경우 가독성을 위해 변수로 추출하거나 별도의 컴포넌트로 분리하는 것을 권장한다. 
