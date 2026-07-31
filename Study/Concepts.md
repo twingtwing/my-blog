@@ -1,4 +1,4 @@
-
+# React 기본 개념
 
 ## 1. Start
 
@@ -923,3 +923,690 @@ function NumberList(props) {
 ```
 
 JSX 인라인 map()은 코드를 줄여주지만, 로직이 복잡해지거나 중첩이 심해지면 가독성이 떨어질 수 있다. 이 경우 가독성을 위해 변수로 추출하거나 별도의 컴포넌트로 분리하는 것을 권장한다. 
+
+## 9. 폼
+
+HTML 폼 엘리먼트는 자체적으로 내부 상태를 가지고 있기 때문에, React의 다른 DOM 엘리먼트와 다르게 동작한다.
+
+```html
+<form>
+    <label>
+        Name:
+        <input type="text" name="name" />
+    </label>
+    <input type="submit" value="Submit" />
+</form>
+```
+
+위와 같은 일반적인 HTML 폼은 사용자가 제출(submit)할 때 새로운 페이지로 이동하는 기본 HTML 동작을 수행한다. React에서도 원한다면 이 방식을 그대로 사용할 수 있다. 하지만 대부분의 경우 JavaScript 함수로 폼 제출을 처리하고, 사용자가 입력한 데이터에 접근하는 방식이 훨씬 편리하다.
+
+이를 구현하는 React의 표준적인 기술을 제어 컴포넌트(Controlled Component)라고 부른다.
+
+### 제어 컴포넌트 (Controlled Component)
+
+HTML의 `<input>`, `<textarea>`, `<select>` 같은 폼 엘리먼트는 브라우저(DOM)가 직접 사용자의 입력을 기억하고 내부 상태를 업데이트한다. 
+반면 React에서는 변경되는 데이터가 컴포넌트의 `state`에 유지되며, `setState`에 의해 업데이트된다.
+
+이 둘을 결합하여 React의 `state`를 '신뢰할 수 있는 단일 출처(Single Source of Truth)'로 만들어 관리하는 방식을 **제어 컴포넌트**라고 한다. 이 방식에서는 입력 폼 엘리먼트의 값이 항상 React의 `state`에 의해 결정된다.
+
+
+```js
+class NameForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { value: '' };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleChange(e) {
+        this.setState({ value: e.target.value });
+    }
+
+    handleSubmit(e) {
+        alert('A name was submitted: ' + this.state.value);
+        e.preventDefault(); // 브라우저의 기본 폼 제출(페이지 새로고침) 방지
+    }
+
+    render() {
+        return (
+            <form onSubmit={this.handleSubmit}>
+                <label>
+                    Name:
+                    <input 
+                        type="text" 
+                        value={this.state.value} 
+                        onChange={this.handleChange} 
+                    />
+                </label>
+                <input type="submit" value="Submit" />
+            </form>
+        );
+    }
+}
+```
+
+input의 value 속성이 this.state.value로 연결되어 있으므로 화면에 보이는 값과 React의 state가 항상 일치한다. 사용자가 글자를 입력할 때마다 handleChange가 실행되어 state를 갱신하고 화면을 다시 그려준다. 이때 handleSubmit 내부의 e.preventDefault()는 폼 제출 시 브라우저가 페이지 전체를 새로고침하는 기본 동작을 차단해준다. 
+
+제어 컴포넌트를 활용하면 코드가 조금 늘어나지만, 입력값을 실시간으로 검증하거나 다른 UI 요소로 전달하고 값을 초기화하는 등 데이터 제어가 매우 자유로워진다.
+
+#### textarea 태그
+
+HTML에서 `<textarea>` 엘리먼트는 텍스트를 자식 노드로 정의한다. 반면 React에서는 `<textarea>`에 `value` 어트리뷰트를 대신 사용한다. 이렇게 하면 `<textarea>`를 사용하는 폼도 한 줄 입력을 처리하는 `<input>` 폼과 동일한 방식으로 간단하게 작성할 수 있다.
+
+```js
+class EssayForm extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            value: 'Please write an essay about your favorite DOM element.'
+        };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleChange(e){
+        this.setState({value: e.target.value});
+    }
+
+    handleSubmit(e){
+        alert('An essay was submitted: ' + this.state.value);
+        e.preventDefault();
+    }
+
+    render(){
+        return(
+            <form onSubmit={this.handleSubmit}>
+                <label>
+                    Essay:
+                    <textarea 
+                        value={this.state.value}
+                        onChange={this.handleChange} />
+                </label>
+                <input type="submit" value="Submit"/>
+            </form>
+        )
+    }
+}
+```
+
+생성자(constructor)에서 this.state.value에 초기값을 지정해두었기 때문에 화면이 처음 로드될 때 <textarea>에 해당 텍스트가 채워진 상태로 시작한다. 일반 <input> 태그와 마찬가지로 value 속성과 onChange 핸들러를 짝지어 다루므로 컴포넌트 로직을 일관되게 유지할 수 있다.
+
+#### select 태그
+
+HTML에서 `<select>`는 드롭다운 목록을 생성한다. 일반 HTML에서는 특정 옵션을 기본 선택 상태로 만들기 위해 해당 `<option>` 태그에 `selected` 어트리뷰트를 지정한다.
+
+```html
+<select>
+  <option value="grapefruit">Grapefruit</option>
+  <option value="lime">Lime</option>
+  <option selected value="coconut">Coconut</option>
+  <option value="mango">Mango</option>
+</select>
+```
+
+반면 React에서는 개별 <option>에 selected 속성을 쓰는 대신 최상단의 <select> 태그에 value 어트리뷰트를 사용한다. 최상단 한 곳에서만 값을 관리하고 업데이트하면 되므로 제어 컴포넌트로 다루기가 훨씬 편해진다.
+
+```js
+class FlavorForm extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {value: 'coconut'};
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleChange(e){
+        this.setState({value: e.target.value});
+    }
+
+    handleSubmit(e){
+        alert('Your favorite flavor is: ' + this.state.value);
+        e.preventDefault();
+    }
+
+    render() {
+        return (
+            <form onSubmit={this.handleSubmit}>
+                <label>
+                    Pick your favorite flavor:
+                    <select value={this.state.value} onChange={this.handleChange}>            
+                        <option value="grapefruit">Grapefruit</option>
+                        <option value="lime">Lime</option>
+                        <option value="coconut">Coconut</option>
+                        <option value="mango">Mango</option>
+                    </select>
+                </label>
+                <input type="submit" value="Submit" />
+            </form>
+        )
+    }
+}
+```
+
+전반적으로 <input type="text">, <textarea>, <select>는 모두 매우 비슷하게 동작한다. 이들 엘리먼트 모두 value 어트리뷰트를 받아 제어 컴포넌트로 일관되게 구현할 수 있다.
+
+#### file input 태그
+
+HTML에서 <input type="file" />은 사용자가 장치 저장소에서 하나 이상의 파일을 선택하여 서버로 업로드하거나, JavaScript의 File API를 통해 파일 데이터를 조작할 수 있게 해준다.
+
+React에서 <input type="file" />의 value 속성은 보안상의 이유로 **읽기 전용(read-only)**이다. 컴포넌트의 state로 값을 직접 설정하거나 제어할 수 없기 때문에, React에서는 항상 **비제어 컴포넌트(Uncontrolled Component)**로 취급된다.
+
+#### 제어되는 Input Null 값
+
+제어 컴포넌트에 value prop을 지정하면 사용자가 임의로 값을 변경할 수 없다. 만약 value를 지정했음에도 불구하고 여전히 입력창 수정이 가능하다면, 실수로 value에 undefined나 null을 전달했을 가능성이 있다.
+
+```js
+ReactDOM.createRoot(document.getElementById('root')!).render(<input value="hi" />);
+
+setTimeout(function() {
+  ReactDOM.createRoot(document.getElementById('root')!).render(<input value={null} />);
+}, 1000);
+```
+
+첫 번째 render 실행 시에는 value="hi"로 고정되어 있어 입력창이 읽기 전용 상태로 잠겨 있다. onChange 이벤트로 값을 업데이트해주지 않는 한, 사용자가 키보드를 아무리 쳐도 글자가 써지지 않고 완전히 잠겨버린다. 하지만 1초 뒤 value 속성에 null이 전달되면 React는 입력창 제어를 해제하게 되어 사용자가 자유롭게 값을 입력하거나 수정할 수 있는 상태로 변하게 된다.
+
+### 다중 입력 제어
+
+여러 입력(input) 엘리먼트를 제어해야 할 때, 각 엘리먼트에 name 어트리뷰트를 추가하고 `event.target.name` 값을 활용하면 하나의 핸들러 함수로 여러 폼 입력값을 처리할 수 있다.
+
+```js
+class Reservation extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            isGoing: true,
+            numberOfGuests: 2
+        }
+
+        this.handleInputChange = this.handleInputChange.bind(this);
+    }
+
+    handleInputChange (e) {
+        const target = e.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+
+        this.setState({[name]: value})
+    }
+
+    render() {
+        return(
+            <form>
+                <label>
+                    Is going:
+                    <input
+                        name="isGoing"
+                        type="checkbox"
+                        checked={this.state.isGoing}
+                        onChange={this.handleInputChange} />
+                </label>
+                <br />
+                <label>
+                    Number of guests:
+                    <input 
+                        name="numberOfGuests"
+                        type="number"
+                        value={this.state.numberOfGuests}
+                        onChange={this.handleInputChange} />
+                </label>
+            </form>
+        )
+    }
+}
+```
+
+주어진 input 태그의 name에 일치하는 state 속성을 동적으로 업데이트하기 위해 ES6의 계산된 프로퍼티 이름(Computed Property Name) 구문인 [name]을 사용한다. 또한 React의 setState()는 기존 state에 변경된 부분만 자동으로 병합(얕은 병합)해주기 때문에, 값이 변경된 특정 속성에 대해서만 지정하여 호출하면 된다.
+
+> 계산된 프로퍼티(Computed Property) 이란 ? 객체 리터럴 안에서 대괄호 [...]를 써서 속성 이름을 동적으로 지정할 수 있는 기능
+ 
+ES6 이전에는 객체를 먼저 생성한 후에 별도의 줄에서 대괄호 표기법을 통해 동적인 속성 이름을 할당해야 했다.
+
+```js
+var keyName = 'username';
+var user = {};
+user[keyName] = '철수';
+```
+
+ES6부터는 객체를 생성하는 문과 동시에 대괄호 []를 써서 변수 값을 바로 속성 이름으로 지정할 수 있게 되었다.
+
+```js
+var keyName = 'username';
+var user = {
+    [keyName]: '철수'
+};
+```
+
+### 제어 컴포넌트의 대안
+
+데이터를 변경할 수 있는 모든 상황에 대해 이벤트 핸들러를 작성하고 React 컴포넌트를 통해 모든 입력 상태를 일일이 연결해야 하기 때문에, 때로는 제어 컴포넌트를 사용하는 방식이 번거롭고 지루할 수 있다. 특히 기존 코드베이스를 React로 마이그레이션하고자 할 때나 React가 아닌 외부 라이브러리와 React 애플리케이션을 통합하고자 할 때 더욱 그렇다. 이러한 경우에는 입력 폼을 구현하기 위한 대안으로 **비제어 컴포넌트(Uncontrolled Component)를 활용**할 수 있다.
+
+### 완전한 해결책
+
+유효성 검사, 방문한 필드 추적, 폼 제출 처리 등 폼 관련 로직을 완벽하게 다루기 위한 통합 솔루션을 원한다면 **Formik**이 대중적으로 쓰이는 라이브러리 중 하나이다. 다만 Formik 역시 결국 제어 컴포넌트와 `state` 관리를 기반으로 작동하기 때문에, 제어 컴포넌트의 기본 개념을 확실히 이해한 상태에서 학습하는 것이 좋다.
+
+## 10. State 끌어올리기
+
+종종 동일한 데이터에 대한 변경사항을 여러 컴포넌트에 반영해야 할 때가 있다. 이럴 때는 각 컴포넌트가 독립적으로 state를 다루는 대신, 가장 가까운 공통 조상 컴포넌트로 state를 끌어올려 관리하는 것이 좋다.
+
+```js 
+const scaleNames = {
+    c: 'Celsius',
+    f: 'Fahrenheit'
+};
+
+function BoilingVerdict(props) {
+    if (props.celsius >= 100) {
+        return <p>The water would boil.</p>;
+    }
+    return <p>The water would not boil.</p>;
+}
+
+class TemperatureInput extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { temperature: '' };
+
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange(e) {
+        this.setState({ temperature: e.target.value });
+    }
+
+    render() {
+        const temperature = this.state.temperature;
+        const scale = this.props.scale;
+        return (
+            <fieldset>
+                <legend>Enter temperature in {scaleNames[scale]}:</legend>
+                <input 
+                    value={temperature}
+                    onChange={this.handleChange} 
+                />
+            </fieldset>
+        );
+    }
+}
+
+class Calculator extends React.Component {
+    render() {
+        return (
+            <div>
+                <TemperatureInput scale="c"/>
+                <TemperatureInput scale="f"/>
+                {/* <BoilingVerdict temperature="{...}"/> */}
+            </div>
+        );
+    }
+}
+```
+
+두 개 이상의 입력 필드를 다루기 위해 위와 같이 구조를 작성할 수 있다. 하지만 각 TemperatureInput 컴포넌트가 자신만의 state를 독자적으로 가지고 있기 때문에, 한쪽 필드에 온도를 입력하더라도 다른 쪽 필드가 함께 갱신되지 않는다.
+
+또한 부모 컴포넌트인 Calculator는 BoilingVerdict에 입력된 온도를 전달할 수 없다. 현재 온도 정보가 하위 컴포넌트인 TemperatureInput 내부에 은닉되어 있어, 부모인 Calculator가 그 값에 직접 접근할 수 없기 때문이다.
+
+### State 끌어올리기
+
+React에서 여러 컴포넌트가 동일한 상태를 공유해야 할 때는, 그 값을 필요로 하는 가장 가까운 공통 조상 컴포넌트로 state를 끌어올림으로써 이를 구현할 수 있다. 이를 **state 끌어올리기**라고 부른다.
+
+`Calculator` 컴포넌트가 공유될 state를 소유하게 되면, 두 입력 필드의 현재 온도에 대한 **단일 출처(Source of Truth)**가 된다. 부모인 `Calculator`로부터 전달받은 props를 통해 두 `TemperatureInput` 컴포넌트가 **항상 일관되고 동기화된 상태**를 유지할 수 있게 된다.
+
+```js
+function toCelsius(fahrenheit) {
+    return (fahrenheit - 32) * 5 / 9;
+}
+
+function toFahrenheit(celsius) {
+    return (celsius * 9 / 5) + 32;
+}
+
+function tryConvert(temperature, convert) {
+    const input = parseFloat(temperature);
+    if (Number.isNaN(input)) {
+        return '';
+    }
+    const output = convert(input);
+    const rounded = Math.round(output * 1000) / 1000;
+    return rounded.toString();
+}
+```
+
+#### TemperatureInput 컴포넌트
+
+```js
+class TemperatureInput extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange(e) {
+        this.props.onTemperatureChange(e.target.value);
+    }
+
+    render() {
+        const temperature = this.props.temperature;
+        const scale = this.props.scale;
+        return (
+            <fieldset>
+                <legend>Enter temperature in {scaleNames[scale]}:</legend>
+                <input 
+                    value={temperature}
+                    onChange={this.handleChange} 
+                />
+            </fieldset>
+        );
+    }
+}
+```
+
+기존의 this.state.temperature를 this.props.temperature로 교체한다. props는 읽기 전용이므로 TemperatureInput은 제어권을 잃게 되며, 자체적으로 setState를 호출하는 대신 부모로부터 전달받은 this.props.onTemperatureChange 함수를 호출하여 값이 변경되었음을 부모에게 알린다.
+
+#### Calculator 컴포넌트
+
+```js
+class Calculator extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { temperature: '', scale: 'c' };
+
+        this.handleCelsiusChange = this.handleCelsiusChange.bind(this);
+        this.handleFahrenheitChange = this.handleFahrenheitChange.bind(this);
+    }
+
+    handleCelsiusChange(temperature) {
+        this.setState({ scale: 'c', temperature });
+    }
+
+    handleFahrenheitChange(temperature) {
+        this.setState({ scale: 'f', temperature });
+    }
+
+    render() {
+        const temperature = this.state.temperature;
+        const scale = this.state.scale;
+
+        const celsius = scale === 'f' ? tryConvert(temperature, toCelsius) : temperature;
+        const fahrenheit = scale === 'c' ? tryConvert(temperature, toFahrenheit) : temperature;
+
+        return (
+            <div>
+                <TemperatureInput 
+                    onTemperatureChange={this.handleCelsiusChange}"
+                    scale="c" 
+                    temperature={celsius}/>
+                <TemperatureInput 
+                    onTemperatureChange={this.handleFahrenheitChange} 
+                    scale="f" 
+                    temperature={fahrenheit}/>
+                <BoilingVerdict celsius="{parseFloat(celsius)}"/>
+            </div>
+        );
+    }
+}
+```
+
+Calculator는 현재 입력값과 단위를 자신의 지역 state에 저장한다. 사용자가 어느 한쪽 입력 필드를 수정하더라도 Calculator의 state가 갱신되고, 변경된 state를 기반으로 다른 한쪽 단위의 온도가 즉시 재계산되어 두 입력 필드가 항상 동기화 상태를 유지한다.
+
+#### 입력값 변경 시 데이터 흐름 순서
+
+1. 사용자가 <input> 필드에 값을 입력하면 DOM의 onChange 이벤트에 지정된 TemperatureInput의 handleChange가 실행된다.
+2. handleChange 내부에서 새로 입력된 값과 함께 this.props.onTemperatureChange()를 호출한다.  
+3. 이 호출은 부모인 Calculator의 handleCelsiusChange 또는 handleFahrenheitChange 메서드로 전달되어 Calculator의 this.setState()를 실행한다.  
+4. **Calculator의 state가 변경되었으므로 React는 Calculator의 render()를 다시 실행한다.** 이때 tryConvert를 통해 양쪽 단위의 온도가 실시간으로 재계산된다.  
+5. 계산된 새 temperature props를 전달받은 각각의 TemperatureInput과 BoilingVerdict 컴포넌트가 다시 렌더링된다.
+6. 최종적으로 React DOM이 변경된 부분만을 화면에 업데이트한다. 사용자가 직접 입력한 필드는 입력값이 그대로 유지되고, 반대쪽 필드는 변환된 값으로 갱신된다.
+
+입력 필드의 값을 변경할 때마다 동일한 절차를 거치고 두 입력 필드는 동기화된 상태로 유지되게 된다.
+
+### 핵심
+
+**React 애플리케이션 안에서 변경이 일어나는 모든 데이터는 '신뢰할 수 있는 단일 출처(Single Source of Truth)'를 하나만 두어야 한다.** 
+
+보통의 경우 `state`는 렌더링에 그 값을 필요로 하는 컴포넌트에 먼저 추가하며, 이후 다른 컴포넌트에서도 그 값이 필요해지면 가장 가까운 공통 조상으로 `state`를 끌어올리면 된다. 서로 다른 컴포넌트 간의 `state`를 강제로 동기화하려고 시도하는 대신, React 고유의 하향식 데이터 흐름(Top-down Data Flow)에 의존하는 것을 권장한다.
+
+**`state`를 끌어올리는 작업은 양방향 바인딩(Two-way Binding) 접근 방식보다 더 많은 보일러플레이트 코드를 유발하지만, 버그를 찾고 격리하기가 훨씬 쉽다는 강력한 장점이 있다.**
+
+어떤 `state`든 특정 컴포넌트 내에 독점적으로 존재하며 그 컴포넌트 스스로만 `state`를 변경할 수 있으므로 버그가 존재할 수 있는 범위가 크게 줄어든다. 또한 사용자 입력을 거부하거나 변형하는 자체 로직을 구현하기에도 용이하다.
+
+(보일러플레이트 코드란? 전혀 변동 없이 여러 곳에서 반복되는 코드)
+
+**어떤 값이 `props`나 기존 `state`로부터 계산될 수 있다면, 그 값은 `state`에 저장하지 않아야 한다.** 
+
+예를 들어 `celsiusValue`와 `fahrenheitValue`를 둘 다 `state`로 저장하는 대신, 가장 최근에 변경된 `temperature`와 `scale`만 저장하는 방식이다. 다른 입력 필드의 값은 항상 이 값들에 기반하여 `render()` 메서드 안에서 계산해낼 수 있으며, 이를 통해 사용자 입력값의 정밀도를 손실 없이 유지한 채 다른 필드의 입력값에 반올림을 지우거나 적용할 수 있게 된다.
+
+## 11. 합성과 상속
+
+React는 강력한 합성(Composition) 모델을 가지고 있다. React팀은 컴포넌트 간의 코드를 재사용할 때 상속 대신 합성을 사용하는 것을 권장하며, 상속으로 인해 발생하는 여러 문제들을 합성을 통해 해결할 수 있다.
+
+#### 컴포넌트에서 다른 컴포넌트를 담기
+
+어떤 컴포넌트들은 어떤 자식 엘리먼트가 들어올지 미리 알 수 없는 경우가 있다. 범용적인 박스 역할을 하는 Sidebar나 Dialog 같은 컴포넌트에서 자주 볼 수 있다.
+
+이러한 컴포넌트에서는 특수한 `children prop`을 사용하여 자식 엘리먼트를 출력에 그대로 전달하는 것이 좋다.
+
+```js
+function FancyBorder(props) {
+    return (
+        <div className={'FancyBorder FancyBorder-' + props.color}>
+            {props.children}
+        </div>
+    );
+}
+
+function WelcomeDialog() {
+    return (
+        <FancyBorder color="blue">
+            <h1 className="Dialog-title">
+                Welcome
+            </h1>
+            <p className="Dialog-message">
+                Thank you for visiting our spacecraft!
+            </p>
+        </FancyBorder>
+    );
+}
+```
+
+<FancyBorder> JSX 태그 내부에 작성된 자식 요소들이 FancyBorder 컴포넌트의 props.children으로 전달된다. FancyBorder는 {props.children}을 <div> 안에 렌더링하므로, 전달받은 자식 엘리먼트들이 최종 출력물로 들어간다.
+
+#### 여러 개의 구멍(Slot)이 필요한 경우
+
+컴포넌트에 하나의 children이 아닌 여러 개의 전달 구멍(Slot)이 필요한 경우, children 대신 자신만의 고유한 prop 이름을 자유롭게 정의하여 전달할 수 있다.
+
+```js
+function SplitPane(props) {
+    return (
+        <div className="SplitPane">
+            <div className="SplitPane-left">
+                {props.left}
+            </div>
+            <div className="SplitPane-right">
+                {props.right}
+            </div>
+        </div>
+    );
+}
+
+function App() {
+    return (
+        <SplitPane 
+            left={
+                <Contacts />
+            }
+            right={
+                <Chat />
+            } 
+        />
+    );
+}
+```
+
+<Contacts/>와 <Chat/> 같은 React 엘리먼트는 결국 자바스크립트 객체이기 때문에, 다른 일반 데이터(문자열, 숫자 등)처럼 prop으로 자유롭게 전달할 수 있다. 이러한 접근 방식은 타 라이브러리의 '슬롯(Slots)' 개념과 유사하지만, React에서는 prop으로 전달할 수 있는 대상에 제약이 없다.
+
+#### 특수화
+
+때로는 범용적인 컴포넌트의 '특정한 목적을 가진 케이스'를 만들어야 할 때가 있다. 예를 들어, 일반적인 대화상자 역할을 하는 Dialog가 있을 때, 환영 인사를 건네는 목적인 WelcomeDialog나 회원가입 전용인 SignUpDialog는 Dialog의 특수한 케이스 이다. 
+
+전통적인 객체지향 프로그래밍(OOP)에서는 이를 상속으로 구현하곤 하지만, React에서는 합성을 통해 해결한다. 더 구체적인(특수한) 컴포넌트(WelcomeDialog)가 일반적인 컴포넌트(Dialog)를 렌더링하면서 props와 children을 전달해 내용을 구성한다.
+
+```js
+function Dialog(props) {
+    return (
+        <FancyBorder color="blue">
+            <h1 className="Dialog-title">
+                {props.title}
+            </h1>
+            <p className="Dialog-message">
+                {props.message}
+            </p>
+        </FancyBorder>
+    );
+}
+
+function WelcomeDialog() {
+    return (
+        <Dialog
+            title="Welcome"
+            message="Thank you for visiting our spacecraft!" 
+        />
+    );
+}
+```
+
+**클래스형 컴포넌트에서의 특수화 예시**
+
+합성 패턴은 클래스형 컴포넌트에서도 동일하게 적용된다. props.children을 함께 활용하면 텍스트뿐만 아니라 <input>이나 <button> 같은 구체적인 UI 엘리먼트까지 일반적인 Dialog에 전달할 수 있다.
+
+```js
+function Dialog(props) {
+    return (
+        <FancyBorder color="blue">
+            <h1 className="Dialog-title">
+                {props.title}
+            </h1>
+            <p className="Dialog-message">
+                {props.message}
+            </p>
+            {props.children}
+        </FancyBorder>
+    );
+}
+
+class SignUpDialog extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { login: '' };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSignUp = this.handleSignUp.bind(this);
+    }
+
+    handleChange(e) {
+        this.setState({ login: e.target.value });
+    }
+
+    handleSignUp() {
+        alert(`Welcome aboard, ${this.state.login}!`);
+    }
+
+    render() {
+        return (
+            <Dialog 
+                title="Mars Exploration Program"
+                message="How should we refer to you?"
+            >
+                <input 
+                    value={this.state.login} 
+                    onChange={this.handleChange} 
+                />   
+                <button onClick={this.handleSignUp}>
+                    Sign Me Up!
+                </button>     
+            </Dialog>
+        );
+    }
+}
+```
+
+#### 그렇다면 상속은?
+
+Meta(Facebook)에서는 수천 개의 React 컴포넌트를 사용하고 있지만, 컴포넌트를 상속 계층 구조로 만드는 것을 권장할 만한 유용한 사례를 아직 찾지 못했다.
+
+props와 합성은 명시적이고 안전한 방법으로 컴포넌트의 모양과 동작을 커스터마이징하는 데 필요한 모든 유연성을 제공한다. 컴포넌트는 원시 타입의 값, React 엘리먼트, 함수 등 어떠한 형태의 props도 자유롭게 전달받을 수 있다.
+
+만약 UI가 아닌 기능(비즈니스 로직 등)을 컴포넌트 간에 재사용하고 싶다면, 해당 로직을 별도의 자바스크립트 모듈로 추출하는 것을 권장한다. 컴포넌트는 상속(extends)받지 않고도 해당 모듈을 불러와(import) 함수, 객체, 클래스 형태로 직접 활용할 수 있다.
+
+## 12. React로 생각하기
+
+React의 가장 멋진 점 중 하나는 앱을 설계하는 방식이다. 상품들을 검색할 수 있는 데이터 테이블을 만드는 과정을 통해 React의 사고 방식을 정리한다.
+
+### 묵업
+
+JSON API와 목업을 디자이너로부터 받았다고 가정해 봅시다. 목업은 다음과 같을 것입니다.
+
+#### 1단계: UI를 컴포넌트 계층 구조로 나누기
+
+첫 번째 단계는 UI의 모든 컴포넌트 주변에 박스를 그리고 각 컴포넌트에 이름을 붙이는 것이다.
+
+- **단일 책임 원칙 (Single Responsibility Principle):** 하나의 컴포넌트는 한 가지 일만 담당하는 것이 이상적이다. 컴포넌트의 역할이 늘어나면 더 작은 하위 컴포넌트로 분리해야 한다.
+- **UI와 데이터 모델의 일치:** 각 컴포넌트가 JSON 데이터 모델의 한 조각을 나타내도록 구조화한다.
+
+```text
+FilterableProductTable (전체 애플리케이션 포괄)
+ ├── SearchBar (유저 입력을 전달받음)
+ └── ProductTable (유저 입력을 기반으로 데이터 컬렉션을 필터링하여 표시)
+      ├── ProductCategoryRow (각 카테고리 헤더 표시)
+      └── ProductRow (각 제품에 대한 행 표시)
+```
+
+#### 2단계: React로 정적인 버전 만들기
+
+컴포넌트 계층 구조가 완성되면 데이터 모델을 기반으로 UI는 렌더링되지만 상호작용(동작)은 없는 정적 버전(Static Version)을 구현한다.
+
+- props 활용: 부모 컴포넌트가 자식 컴포넌트에게 데이터를 전달할 때는 props를 사용한다.
+- state 사용 금지: 정적 버전을 만들 때 state는 전혀 사용하지 않는다. state는 오직 상호작용(시간에 따라 변하는 데이터)을 위해서만 존재한다.
+- 개발 방식:
+    - 하향식 (Top-down): 상위 컴포넌트(FilterableProductTable)부터 작성
+    - 상향식 (Bottom-up): 하위 컴포넌트(ProductRow)부터 작성 및 테스트 (대규모 프로젝트에 유리)
+
+#### 3단계: UI state에 대한 최소한의 (하지만 완전한) 표현 찾아내기
+
+UI를 상호작용하게 만들려면 데이터 모델을 변경할 수 있는 최소한의 state 집합을 찾아내야 한다. (중복 배제 원칙)
+
+**데이터가 state인지 판단하는 3가지 질문:**
+
+1. 부모로부터 props를 통해 전달되는가? → state가 아님
+2. 시간이 지나도 변하지 않는가? → state가 아님
+3. 컴포넌트 안의 다른 state나 props를 통해 계산 가능한가? → state가 아님
+
+- 원본 제품 목록: props로 전달되므로 state가 아님
+- 필터링된 제품 목록: 원본 목록 + 검색어 + 체크박스 상태로 계산 가능하므로 state가 아님
+- 최종 선택된 state:
+    - 유저가 입력한 검색어 (filterText)
+    - 체크박스의 값 (inStockOnly)
+
+#### 4단계: State가 어디에 있어야 할지 찾기
+
+state를 소유하고 변경할 적절한 컴포넌트를 결정한다.
+
+**State 위치 결정 절차:**
+
+1. 해당 state를 기반으로 렌더링되는 모든 컴포넌트를 찾는다.
+2. 공통 소유 컴포넌트(Common Owner Component)를 찾는다. (계층 구조 내에서 해당 state가 필요한 컴포넌트들의 최상단에 위치한 공통 부모)
+3. 공통 혹은 더 상위에 있는 컴포넌트가 state를 가져야 한다.
+4. 적절한 컴포넌트가 없다면 state만을 소유하는 상위 컴포넌트를 새로 만들어 추가한다.
+
+본 예시에서는 SearchBar와 ProductTable의 공통 부모인 FilterableProductTable이 filterText와 inStockOnly state를 소유하게 된다.
+
+#### 5단계: 역방향 데이터 흐름 추가하기
+
+하단 폼 컴포넌트(SearchBar)에서 입력이 일어났을 때 상위 컴포넌트(FilterableProductTable)의 state를 업데이트할 수 있도록 데이터 흐름을 연결한다.
+
+- React는 단방향 데이터 흐름을 따르므로, 하위 컴포넌트가 부모의 state를 직접 변경할 수 없다.
+- FilterableProductTable은 SearchBar에 state를 변경하는 콜백 함수(이벤트 핸들러)를 props로 전달한다.
+- SearchBar는 <input>의 onChange 이벤트 발생 시 이 콜백 함수를 호출하여 부모의 state를 업데이트한다.
