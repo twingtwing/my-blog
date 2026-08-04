@@ -1,0 +1,29 @@
+/* 
+Recipe.css에는:
+레시피 좌우 레이아웃
+카테고리 트리
+레시피 그리드
+레시피 카드 스타일
+*/
+
+.recipe-container {
+    display: grid;
+    grid-template-columns: 3fr 7fr;
+    gap: var(--space-sm);
+}
+
+.recipe-container .inner-left,.inner-right {
+    border-radius: 8px;
+    border: 1px solid var(--key-color);
+    padding: 10px 15px;
+}
+
+.recipe-container .tree summary,li {
+    list-style: none;
+    cursor: pointer;
+}
+
+.recipe-container .inner-card {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
