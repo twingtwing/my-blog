@@ -1,0 +1,127 @@
+:root {
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+
+  --key-color: #466437;
+  --key-font-color: #374F2B;
+  --key-font-color-low: #BCCFAD;
+}
+
+/* 
+App.css에는 이런 것만 남겨:
+:root CSS 변수
+body 기본값
+.wrapper
+공통 .container
+전체 폰트나 배경색
+*/
+
+body {
+    height: 100%;
+}
+
+.wrapper {
+    padding: 10px 15px;
+    /* 양옆에 padding 주고싶은데 반응형이라서 안됨 */
+}
+
+/* Header */
+.header {
+    padding: 5px 0;
+}
+
+.logo {
+    margin: 0;
+    padding: 10px 15px;
+}
+
+.logo a img {
+    max-width: auto;
+    max-height: 32px;
+}
+
+.header-box {
+    border-radius: 8px;
+    background-color: var(--key-color);
+    padding: 8px 15px;
+}
+
+.categories {
+    display: flex;
+    gap: var(--space-sm);
+    flex: 1;
+}
+
+.categories > div {
+    padding: 4px 10px;
+    cursor: pointer;
+}
+
+.categories > div:hover {
+    border-radius: 8px;
+    background-color: var(--key-font-color);
+}
+
+.categories > div button {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--key-font-color);
+
+    background-color: transparent; 
+    border: none;
+}
+
+.categories > div:hover button {
+    color: var(--key-font-color-low);
+}
+
+/* Container */
+
+.container {
+    display: flex;
+    flex-direction: column; 
+    gap: var(--space-sm);
+    padding: 5px 0;
+
+}
+
+.banner {
+    border-radius: 8px;
+    border: 1px solid var(--key-color);
+}
+
+.contents {
+    display: grid;
+    grid-template-columns: 7fr 3fr; /* 7:3 비율로 나눔 */
+    width: 100%;
+    gap: var(--space-sm); /* (선택) 좌우 박스 사이 간격 */
+}
+
+.contents > div {
+    border-radius: 8px;
+    border: 1px solid var(--key-color);
+}
+
+.card-right {
+    margin: 8px 3px;
+}
+
+.card {
+    border-radius: 10px;
+    border: 1px solid var(--key-color);
+    margin: 8px 5px;
+    padding: 5px;
+}
+
+.card-title {
+    font-size: 13px;
+    padding-bottom: 5px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    padding-top: 5px;
+}
