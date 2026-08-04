@@ -1,5 +1,4 @@
 import React from 'react'
-import ReactDOM from 'react-dom/client'
 import './TicTacToe.css';
 
 function calculateWinner(squares) {
@@ -24,6 +23,7 @@ function calculateWinner(squares) {
 
 function Square(props) {
   return (
+    // function 이므로 this.을 사용할 필요 없음
     <button className="square" onClick={props.onClick}> 
       {props.value}
     </button>
@@ -35,6 +35,11 @@ class Board extends React.Component {
     return (
       <Square
         value={this.props.squares[value]}
+        /*
+          이벤트 핸들러에 인자를 전달해야하는 경우,
+          function 을 사용하면, 즉시 실행되기 때문에 콜백 형태로 감싸야한다.
+          그래서 화살표 함수나 bind 메서드를 사용 한다.
+        */
         onClick={() => this.props.onClick(value)}
       />
     );
@@ -63,6 +68,11 @@ class Board extends React.Component {
   }
 }
 
+
+/* 
+  단일 출처(Single Source of Truth): 데이터는 한 곳에서만 관리하여 동기화 오류 방지
+  상태 끌어올리기(Lifting State Up): Board와 info가 공유하는 state를 공통 부모(Game)로 이동
+*/
 class Game extends React.Component {
   constructor(props) { 
     super(props);
@@ -111,6 +121,7 @@ class Game extends React.Component {
         'Go to move #' + move :
         'Go to game start';
       return (
+        // list는 key값을 가진다.
         <li key={move}>
           <button onClick={() => this.handleJump(move)}>{desc}</button>
         </li>
@@ -128,6 +139,11 @@ class Game extends React.Component {
         <div className='game-board'>
           <Board 
             squares = {current.squares}
+            /* 
+              (i)는 Board가 넘겨준 '클릭된 칸 번호'를 받아서 handleClick으로 전달해주는 인자 값.
+              onClick={() => this.props.onClick(value)}을 보면 칸의 위치 값을 인자로 담아 호출 하고있음.
+              그러면 그 위치번호를 Game 컴포넌트의 (i) => ... 로 받아서 this.handleClick(i)로 넘겨줌
+            */
             onClick = {(i) => this.handleClick(i)}
           />
         </div>
