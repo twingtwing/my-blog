@@ -1,4 +1,4 @@
-import { recipes } from "../data/recipe";
+import { recipeData } from "../data/recipe";
 
 function Home() {
     /* 
@@ -15,7 +15,7 @@ function Home() {
                 </div>
                 <div className='content-right'>
                     <div className='card-right'>
-                        {recipes.map(recipe => (
+                        {recipeData.map(recipe => (
                             <div key={recipe.id} className='card'>
                                 <div className='card-title'>
                                     <span>{recipe.title}</span>

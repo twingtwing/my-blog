@@ -9,3 +9,9 @@
 함수 컴포넌트에만 사용..?
 
 [이걸로 공부](https://ko.react.dev/reference/react/useState)
+
+### useMemo
+
+### 배열함수
+
+forEach 내부 return은 함수를 종료시키지 못함

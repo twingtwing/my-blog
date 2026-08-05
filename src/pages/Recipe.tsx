@@ -1,13 +1,20 @@
 import React from 'react'
 
 import './Recipe.css'
-import { recipes, recipeTypes } from "../data/recipe";
+import { recipeData, recipeCategories } from "../data/recipe";
 
-/*
-    next
+/* 
+- [ ] 레시피 상세 화면 기본 구조 만들기
+- [ ] 레시피 작성 화면 기본 구조 만들기
+- [ ] little 리팩토링
 
-- [ ] 레시피 상세 화면 만들기
-- [ ] 카드 클릭 시 상세 화면 보여주기
+- [ ] Lexical 최소 기능 연결
+  - [ ] 일반 텍스트 입력
+  - [ ] 제목
+  - [ ] 굵게
+  - [ ] 순서 있는 목록 / 순서 없는 목록
+  - [ ] 입력 내용 변경 확인
+
 */
 
 /* 
@@ -15,6 +22,7 @@ import { recipes, recipeTypes } from "../data/recipe";
     계층형 자료로 변경
 */
 class Tree extends React.Component {
+    
     renderNode(node){
         return (
             <div className='node'>
@@ -27,35 +35,34 @@ class Tree extends React.Component {
                     e.preventDefault();
                 }}>{node.name}</span>
             </div>
-        )
+        );
     }
 
-    render() {
-        const root = {
-            id : 'all',
-            name : '전체',
-        }
+    renderTree(categories) {
+        return (
+            categories.map(category => (
+                (category.children && category.children.length > 0) ? (
+                    <details open key={category.id}>
+                        <summary>{this.renderNode(category)}</summary>
+                        <ul>{this.renderTree(category.children)}</ul>
+                    </details>
+                ) : (
+                    <li key={category.id}>{this.renderNode(category)}</li>
+                )
+            ))
+        );
+    }
 
+    render() {  
         return (
             <div className='inner-left'>
                 <div className='tree'>
-                    <details open>
-                        <summary>{this.renderNode(root)}</summary>
-                        <ul>
-                            {recipeTypes.map(type => (
-                                type.children.length > 0 ?
-                                <details open key={type.id}>
-                                    <summary>{this.renderNode(type)}</summary>
-                                    <ul>
-                                        {type.children.map(child => (
-                                            <li key={child.id}>{this.renderNode(child)}</li>
-                                        ))}
-                                    </ul>
-                                </details> :
-                                <li key={type.id}>{this.renderNode(type)}</li>
-                            ))}
-                        </ul>
-                    </details>
+                    {this.renderTree([{
+                        id: "root",
+                        name: "전체",
+                        order: 1,
+                        children: recipeCategories
+                    }])}
                 </div>
             </div>
         )
@@ -63,65 +70,163 @@ class Tree extends React.Component {
 }
 
 class Card extends React.Component {
-    findTargetNode(id) {
-        for (const types of recipeTypes) {
-            if(types.id === id) return types.name ;
-            for (const type of types.children) {
-                if(type.id === id) return type.name ;
+    
+    searchCard(categories) {
+        const categoryId = this.props.categoryId;
+        if(categoryId === 'root') return [[{ id: "root", name: "전체"}], recipeData];
+
+        for(const category of categories){
+            if (category.id === categoryId) {
+                return [[category], this.searchNode([category])];
+            } 
+            else if(category.children && category.children.length > 0) {
+                const [childPath, recipes] = this.searchCard(category.children);
+                if(childPath.length > 0) {
+                    return [[category, ...childPath], recipes];
+                }
             }
         }
-        return 'all';
+        return [[], []];
     }
 
-    render() {
-        const name = this.findTargetNode(this.props.nowId) ;
-        
+    searchNode(categories){
+        let recipes = [];
+        categories.forEach(category => {
+            recipes.push(recipeData.filter(data => data.categoryId === category.id ))
+
+            if(category.children && category.children.length > 0) {
+                recipes.push(this.searchNode(category.children))
+            }
+        }); 
+        return recipes;
+    }
+
+    render () {
+        const [categories, recipes] = this.searchCard(recipeCategories);
         return (
-            <div className='inner-right'>
-                <div>
-                    <span>{name}</span>
+            <div>
+                <div className='contents-header'>
+                    <div className='header-title'>
+                        {categories.map(category => (
+                            <span key={category.id}>{category.name}</span>
+                        ))}
+                    </div>
+                    <div className='header-nav'></div>
                 </div>
                 <div className='inner-card'>
-                    {
-                        recipes
-                            .filter(recipe => name === 'all' || recipe.category === name || recipe.subCategory === name)
-                            .map(recipe => (
-                                <div key={recipe.id} className='card'>
-                                    <div className='card-title'>
-                                        <span>{recipe.title}</span>
-                                    </div>
-                                    <div className='card-footer'>
-                                        <div>
-                                            <span>{recipe.category} • {recipe.subCategory}</span>
-                                        </div>
-                                        <div>
-                                            <span>{recipe.calories} kcal</span>
-                                        </div>
-                                    </div>
+                    {recipes.map(recipe => (
+                        <div 
+                            className='card'
+                            key={recipe.id} 
+                            onClick={() => this.props.onClick(recipe.id)}>
+                            <div className='card-title'>
+                                <span>{recipe.title}</span>
+                            </div>
+                            <div className='card-footer'>
+                                <div>
+                                    <span>{recipe.category} • {recipe.subCategory}</span>
                                 </div>
-                            ))
-                    }
+                                <div>
+                                    <span>{recipe.calories} kcal</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         )
     }
 }
 
+// class Detail extends React.Component {
+//     findRecipe(id) {
+//         const index = recipes.findIndex(recipe => recipe.id === id);
+        
+//         return index < 0 ? null : recipes[index]; 
+//     }
+//     /* 
+//         제목 챔터 
+//         상세 설명
+//         ---
+//         재료 카드
+//         ---
+    
+//     */
+//     makeDetail(recipe) {
+//         return (
+//             <div className='detail-recipe'>
+//                 <div className='detail-header'>
+//                     <span>{recipe.title}</span>
+//                     <span>{recipe.description}</span>
+//                 </div>
+//                 <div className='detail-ingredients'>
+//                     {
+//                         recipe.ingredients.map((value, index) => (
+//                             <div 
+//                                 className='card-ingredients'
+//                                 key={index}>
+//                                 {value}</div>
+//                         ))
+//                     }
+//                 </div>
+//                 <div className='detail-content'>
+//                     {recipe.content}
+//                 </div>
+//             </div>
+//         )
+//     }
+
+//     render() {
+//         const recipe = this.findRecipe(this.props.id);
+
+//         return (
+//             <div className='detail'>
+//                 {
+//                     recipe === null ? 
+//                     <div className='detail-error'>
+//                         <span>존재하지 않는 자료입니다.</span>
+//                     </div> :
+//                     this.makeDetail(recipe)
+//                 }
+//             </div>
+//         )
+//     }
+// }
+
 export default class Recipe extends React.Component {
     constructor(props){
         super(props);
-        this.state = {nowId: 'all'}
+        this.state = {
+            categoryId : 'root',
+            recipeId : null
+        }
     }
 
-    handleClick(id) {
-        this.setState({nowId: id});
+    handleTreeClick(categoryId) {
+        this.setState({
+            categoryId: categoryId,
+            recipeId : null // 초기화
+        });
+    }
+
+    handleCardClick(id) {
+        this.setState({nowRecipe : id});
     }
 
     render() {
+        const nowRecipe = this.state.nowRecipe;
         return (
             <div className='recipe-container'>
-                <Tree onClick = {(id) => this.handleClick(id)} />
-                <Card nowId={this.state.nowId} />
+                <Tree onClick = {(id) => this.handleTreeClick(id)} />
+                <div className='inner-right'>
+                    {
+                        // nowRecipe >= 0 ?
+                        // <Detail id={nowRecipe}/> :
+                        <Card 
+                            onClick = {(id) => this.handleCardClick(id)} 
+                            categoryId={this.state.categoryId} />
+                    }
+                </div>
             </div>
         )
     }
