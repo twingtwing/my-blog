@@ -15,3 +15,9 @@
 ### 배열함수
 
 forEach 내부 return은 함수를 종료시키지 못함
+
+
+### ...[]
+
+[arrya, ...array2]
+[...array, ...array2]
