@@ -5,11 +5,11 @@
 
 - [x] React 공식 사이트 기본 개념
 - [x] React 공식 사이트 자습서
-- [ ] React + CSS로 메인 페이지 만들기
+- [ ] React + CSS로 메인 페이지 만들기 (8월 1째주)
   - HTML / CSS 핵심 개념 — Flexbox, Grid, 반응형
-- [ ] Tailwind CSS로 스타일 변경
+- [ ] Tailwind CSS로 스타일 변경   (8월 2째주)
   - 반응형 UI 적용  
-- [ ] React Router — 페이지 분리 및 확장
+- [ ] React Router — 페이지 분리 및 확장  (8월 3째주)
   - [ ] Wiki의 경우, markdown editor 필요
     - [ ] Lexical 최소 기능 연결
       - [ ] 일반 텍스트 입력
@@ -22,7 +22,6 @@
       - [ ] EditorState JSON 확인
       - [ ] 저장할 데이터 구조 정하기
       - [ ] 저장된 데이터를 다시 불러오는 방식 확인
-
 - [ ] Supabase 연동 — CRUD 구현
   - Lexical 추가 기능 (현재는 기본기능)
 - [ ] Supabase Auth, RLS — 로그인과 사용자별 권한 추가
@@ -39,7 +38,7 @@
 - 로그인 / 회원가입
 
 
-### 현재
+### 이번주에 할일
 
 #### React + CSS로 메인 페이지 만들기
 

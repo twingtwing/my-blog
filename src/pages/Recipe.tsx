@@ -8,13 +8,6 @@ import { recipeData, recipeCategories } from "../data/recipe";
 - [ ] 레시피 작성 화면 기본 구조 만들기
 - [ ] little 리팩토링
 
-- [ ] Lexical 최소 기능 연결
-  - [ ] 일반 텍스트 입력
-  - [ ] 제목
-  - [ ] 굵게
-  - [ ] 순서 있는 목록 / 순서 없는 목록
-  - [ ] 입력 내용 변경 확인
-
 */
 
 /* 
