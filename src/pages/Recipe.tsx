@@ -4,13 +4,6 @@ import './Recipe.css'
 import { recipeData, recipeCategories } from "../data/recipe";
 
 /* 
-- [ ] 레시피 상세 화면 기본 구조 만들기
-- [ ] 레시피 작성 화면 기본 구조 만들기
-- [ ] little 리팩토링
-
-*/
-
-/* 
     추후에 tree도 커스텀 되도록 변경
     계층형 자료로 변경
 */
@@ -82,7 +75,6 @@ class Card extends React.Component {
         return [[], []];
     }
 
-    // 중복 제거 필요
     searchNode(categories){
         let recipes = [];
         categories.forEach(category => {
@@ -162,50 +154,55 @@ class Detail extends React.Component {
         ---
     
     */
-    makeDetail(recipe) {
+    render() {
+        const index = recipeData.findIndex(recipe => recipe.id === this.props.recipeId);
+        const recipe = recipeData[index];
+        const path = (
+            this.searchPath(recipe.categoryId, recipeCategories).map(category =>
+                    <span key={category.id}>{category.name}</span>
+                )
+        );
         return (
-            <div className='detail-recipe'>
-                <div className='detail-header'>
-                    <span>{recipe.title}</span>
-                    <div>
-                        {this.searchPath(recipe.categoryId, recipeCategories).map(category =>
-                            <span key={category.id}>{category.name}</span>
-                        )}
+            <div className='detail'>
+                <div className='detail-recipe'>
+                    <div className='detail-header'>
+                        <span>{recipe.title}</span>
+                        <div>{path}</div>
                     </div>
-                </div>
-                <div className='detail-desc'>
-                    <span>{recipe.description}</span>
-                </div>
-                <div className='detail-ingredients'>
-                    {
-                        recipe.ingredients.map((value, index) => (
-                            <div className='card' key={index}>
-                                <span>{value}</span>
-                            </div>
-                        ))
-                    }
-                </div>
-                <div className='detail-content'>
-                    {recipe.content}
+                    <div className='detail-desc'>
+                        <span>{recipe.description}</span>
+                    </div>
+                    <div className='detail-ingredients'>
+                        {
+                            recipe.ingredients.map((value, index) => (
+                                <div className='card' key={index}>
+                                    <span>{value}</span>
+                                </div>
+                            ))
+                        }
+                    </div>
+                    <div className='detail-content'>
+                        {recipe.content}
+                    </div>
                 </div>
                 <div className='detail-footer'>
                     <button type="button" onClick={() => this.props.onClick(this.props.recipeId)}>수정</button>
+                    <button type="button" onClick={() => this.props.onClick(this.props.recipeId)}>삭제</button>
                 </div>
-            </div>
-        )
-    }
-
-    render() {
-        const index = recipeData.findIndex(recipe => recipe.id === this.props.recipeId);
-        return (
-            <div className='detail'>
-                {
-                    index < 0 ? 
-                    <div className='detail-error'>
-                        <span>존재하지 않는 자료입니다.</span>
-                    </div> :
-                    this.makeDetail(recipeData[index])
-                }
+                <div className='card'>
+                    <div>
+                        <div>{path}</div>
+                        <span>카테고리의 다른 글</span>
+                    </div>
+                    <hr />
+                    <div>
+                        {recipeData
+                            .filter(data => data.categoryId === recipe.categoryId)
+                            .map(recipe => (
+                                <span key={recipe.id}>{recipe.title}</span>
+                            ))}
+                    </div>
+                </div>
             </div>
         )
     }
@@ -223,32 +220,39 @@ class Detail extends React.Component {
 */
 class RecipeCreate extends React.Component {
     render() {
+        const isEdit = this.props.isEdit
+        const recipe = recipeData.find(data => data.id === this.props.recipeId)
         return (
             <div>
                 {/* 이거 왜 제출 누르면 새고가 되지..? */}
                 <form onSubmit={this.props.onSubmit}> 
                     <div className='create-header'>
-                        <label>
-                            제목 
-                            <input type="text" />
-                        </label>
+                        {
+                            !isEdit ?
+                            <input type="text" placeholder="제목"/> : 
+                            <span>{recipe?.title}</span>
+                        }
                     </div>
                     <div className='create-desc'>
-                        <label>
-                            설명 
-                            <input type="text" />
-                        </label>
+                        <input type="text" value={isEdit && recipe?.description} placeholder="설명"/>
                     </div>
                     <hr />
                     <div className='create-ingre'>
+                        {
+                            !isEdit ?
+                            <input type="text" placeholder="재료"/> : 
+                            recipe?.ingredients.map((value, index) => (
+                                <div key={index}>{value}</div>
+                            ))
+                        }
                         {/* 태그 처럼 추가 일단은 */}
-                        <input type="text" />
                     </div>
                     <hr />
                     <div className='create-content'>
+                        {/* <button>단계별로 되도록 데이터 수정필요</button>  */}
                         <label>
                             1번 
-                            <input type="text" />
+                            <input type="text" placeholder="레시피" value={isEdit && recipe?.content}/>
                         </label>
                         {/* <button>삭제</button>  */}
                         <button>추가</button>
@@ -256,12 +260,12 @@ class RecipeCreate extends React.Component {
                     <div className='create-plus'>
                         <label>
                             참고사항 
-                            <textarea />
+                            <textarea value='데이터에 추가해야함'/>
                         </label>
                     </div>
                     <div className='create-footer'>
                         <button type="submit">저장</button>
-                        <button type="button" onClick={() => this.props.onClick(this.props.categoryId)}>취소</button>
+                        <button type="button" onClick={() => this.props.onClick(!isEdit ? this.props.categoryId : this.props.recipeId)}>취소</button>
                     </div>
                 </form>
             </div>
@@ -273,9 +277,10 @@ export default class Recipe extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            state: 'tree',
+            view: 'tree',
             categoryId : 'root',
-            recipeId : null
+            recipeId : null,
+            isEdit: false,
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -283,29 +288,31 @@ export default class Recipe extends React.Component {
 
     handleTreeClick(categoryId) {
         this.setState({
-            state: 'tree',
+            view: 'tree',
             categoryId: categoryId,
         });
     }
 
     handleCardClick(recipeId) {
         this.setState({
-            state: 'card',
+            view: 'card',
             recipeId : recipeId,
         });
     }
 
     handleCreateClick(categoryId) {
         this.setState({
-            state: 'create',
+            view: 'create',
             categoryId: categoryId,
+            isEdit: false,
         });
     }
 
     handleEditClick (recipeId) {
         this.setState({
-            state: 'create',
+            view: 'create',
             recipeId : recipeId,
+            isEdit: true,
         });
     }
 
@@ -316,27 +323,29 @@ export default class Recipe extends React.Component {
 
     render() {
         let content;
-        const state = this.state.state;
+        const view = this.state.view;
 
-        if(state === 'tree') {
+        if(view === 'tree') {
             content = (
                 <Card 
                     onCardClick = {(id) => this.handleCardClick(id)} 
                     onCreateClick = {(id) => this.handleCreateClick(id)} 
                     categoryId={this.state.categoryId} />
             );
-        } else if (state === 'card') {
+        } else if (view === 'card') {
             content = (
                 <Detail 
                     onClick = {(id) => this.handleEditClick(id)} 
                     recipeId={this.state.recipeId}/>
             );
-        } else if (state === 'create') {
+        } else if (view === 'create') {
             content = (
                 <RecipeCreate 
                     onSubmit={this.handleSubmit}
-                    onClick= {(id) => this.handleTreeClick(id)}
-                    categoryId={this.state.categoryId} />
+                    onClick= {(id) => this.state.isEdit ? this.handleCardClick(id) : this.handleTreeClick(id)}
+                    isEdit={this.state.isEdit}
+                    categoryId={this.state.categoryId}
+                    recipeId={this.state.recipeId} />
             )
         } else {
             content = (<div>화면 로딩 중 에러가 발생하였습니다.</div>)

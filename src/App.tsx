@@ -1,46 +1,19 @@
 import React from 'react'
-import './App.css'
-import logo from './assets/logo.png'
-
-import Home from './pages/Home'
+import Header from './components/Header'
+import Home from './pages/home/Home'
 import Recipe from './pages/Recipe'
-
-function Header(props) {
-    const categories = ['Wiki', 'Recipe', 'Photowalk']
-    return (
-        <div className='header'>
-            <div className='header-top'>
-                <h1 className='logo'>
-                    <a onClick={() => props.onClick('Home')}>
-                        <img src={logo} alt='logo'></img>
-                    </a>
-                </h1>
-            </div>
-            <div className='header-box'>
-                <div className='categories'>
-                    {categories.map(category => (
-                        <div key={category}>
-                            <button onClick={() => props.onClick(category)}>
-                                {category}
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-}
+import './Style.css'
 
 function App() {
     const [currentPage, setPage] = React.useState('Home');
 
-    const handlerCategory = (category) => {
-        setPage(category)
+    const handlerManu= (menu: string) => {
+        setPage(menu)
     }
     
     return (
         <div className='wrapper'>
-            <Header onClick={handlerCategory}/>
+            <Header onClick={handlerManu}/>
             {
                 currentPage !== 'Recipe' ? <Home /> : <Recipe />
             }

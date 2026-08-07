@@ -1,0 +1,29 @@
+/* 
+Style.css 들어가야하는 값
+- 전역 변수 :root CSS 변수 전체 폰트나 배경색
+- 앱의 최상위 레이아웃 body 기본값 / .wrapper
+- 아주 제한적인 공통 배치 
+*/
+
+:root {
+  --space-tiny: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  
+  --border-radius: 8px;
+
+  --key-color: #466437;
+  --key-font-color: #374F2B;
+  --key-font-color-low: #BCCFAD;
+}
+
+
+body {
+    height: 100%;
+}
+
+.wrapper {
+    padding: 0 15px;
+    /* 양옆에 padding 주고싶은데 반응형이라서 안됨 */
+}

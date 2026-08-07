@@ -1,0 +1,45 @@
+.header {
+    padding: var(--space-tiny) 0;
+}
+
+.logo {
+    margin: 0;
+    padding: 10px 15px;
+}
+
+.logo img {
+    max-width: auto;
+    max-height: 32px;
+}
+
+.menu {
+    display: flex;
+    gap: var(--space-sm);
+    flex: 1;
+    background-color: var(--key-color);
+    border-radius: var(--border-radius);
+    padding: 8px 15px;
+}
+
+.menu div {
+    padding: 4px 10px;
+    cursor: pointer;
+}
+
+.menu div:hover {
+    border-radius: var(--border-radius);
+    background-color: var(--key-font-color);
+}
+
+.menu button {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--key-font-color);
+
+    background-color: transparent; 
+    border: none;
+}
+
+.menu div:hover button {
+    color: var(--key-font-color-low);
+}

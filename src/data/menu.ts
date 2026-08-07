@@ -1,0 +1,1 @@
+export const menu = ['Wiki', 'Recipe', 'Photowalk']; // 메뉴 늘어나면 반응형 필요

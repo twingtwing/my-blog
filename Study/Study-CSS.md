@@ -187,4 +187,18 @@ Grid의 `fr` 단위는 전체 너비에서 `gap`(사이 간격)을 뺀 **진짜 
 
 
 detail surmmary해서tree..?
+
+### 반응형 분기점 @media
+
+#### 미디어 쿼리
+
+이미지 정중아에서 가로세로 3:1로 맞추고싶다면...?
+
+
+.target-image {
+  width: 100%;              /* 원하는 너비 지정 (예: 600px 또는 100%) */
+  aspect-ratio: 3 / 1;      /* 가로:세로 = 3:1 비율 고정 */
+  object-fit: cover;        /* 비율을 유지하며 영역을 꽉 채우고 남는 부분 잘라내기 */
+  object-position: center;   /* 중앙을 기준으로 크롭 (기본값이 center입니다) */
+}
 ```

@@ -1,0 +1,56 @@
+.container {
+    display: flex;
+    flex-direction: column; 
+    gap: var(--space-sm);
+    padding: var(--space-tiny) 0;
+
+}
+
+.banner img {
+    width: 100%;
+    aspect-ratio: 3/1;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--border-radius);
+}
+
+/* 
+.banner {
+    border-radius: 8px;
+    border: 1px solid var(--key-color);
+}
+
+.contents {
+    display: grid;
+    grid-template-columns: 7fr 3fr; /* 7:3 비율로 나눔  *//*
+    width: 100%;
+    gap: var(--space-sm);  /* (선택) 좌우 박스 사이 간격  *//*
+}
+
+.contents > div {
+    border-radius: 8px;
+    border: 1px solid var(--key-color);
+}
+
+.card-right {
+    margin: 8px 3px;
+}
+
+.card {
+    border-radius: 10px;
+    border: 1px solid var(--key-color);
+    margin: 8px 5px;
+    padding: 5px;
+}
+
+.card-title {
+    font-size: 13px;
+    padding-bottom: 5px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    padding-top: 5px;
+}   */
