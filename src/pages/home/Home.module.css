@@ -1,9 +1,20 @@
 .container {
-    display: flex;
+    position: relative;
+
+    /* display: flex;
     flex-direction: column; 
     gap: var(--space-sm);
-    padding: var(--space-tiny) 0;
+    padding: var(--space-tiny) 0; */
 
+}
+
+.banner,.contents {
+    max-width: var(--body-width);
+    margin: 0 auto;
+}
+
+.banner div {
+    padding: var(--space-md);
 }
 
 .banner img {
@@ -14,43 +25,40 @@
     border-radius: var(--border-radius);
 }
 
-/* 
-.banner {
-    border-radius: 8px;
-    border: 1px solid var(--key-color);
-}
-
-.contents {
-    display: grid;
-    grid-template-columns: 7fr 3fr; /* 7:3 비율로 나눔  *//*
-    width: 100%;
-    gap: var(--space-sm);  /* (선택) 좌우 박스 사이 간격  *//*
-}
-
 .contents > div {
-    border-radius: 8px;
-    border: 1px solid var(--key-color);
+    display: flex;
+    column-gap: var(--space-sm); 
+    margin: 0 auto;
+    padding: var(--space-md);
 }
 
-.card-right {
-    margin: 8px 3px;
+.content-left {
+    flex: 1;
+}
+
+.content-right {
+    flex: 0 0 400px;
+}
+
+.slide {
+    margin: 0 var(--space-md);
 }
 
 .card {
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     border: 1px solid var(--key-color);
-    margin: 8px 5px;
-    padding: 5px;
-}
 
-.card-title {
+    padding: var(--space-sm);
+    margin: var(--space-sm) 0;
+}
+ 
+.card-desc {
     font-size: 13px;
     padding-bottom: 5px;
 }
 
 .card-footer {
     display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    padding-top: 5px;
-}   */
+    justify-content: flex-end;
+    font-size: 13px;
+}   

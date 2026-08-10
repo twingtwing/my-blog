@@ -1,5 +1,11 @@
 .header {
-    padding: var(--space-tiny) 0;
+    position: relative;
+    border-bottom: 1px solid var(--key-color);
+}
+
+.header-in {
+    max-width: var(--body-width);
+    margin: 0 auto; /* 이래야 정중아에 옹ㅁ */
 }
 
 .logo {
@@ -12,34 +18,31 @@
     max-height: 32px;
 }
 
+.middle {
+    padding: 0 var(--space-md);
+}
+
 .menu {
     display: flex;
-    gap: var(--space-sm);
-    flex: 1;
-    background-color: var(--key-color);
-    border-radius: var(--border-radius);
-    padding: 8px 15px;
+    gap: 0 var(--space-sm);
+    align-items: stretch;
+    padding: 0;
+    margin: 0;
 }
 
-.menu div {
-    padding: 4px 10px;
+.menu li {
     cursor: pointer;
-}
-
-.menu div:hover {
-    border-radius: var(--border-radius);
-    background-color: var(--key-font-color);
+    padding: var(--space-sm);
 }
 
 .menu button {
+    background-color: transparent; 
+    color: var(--key-font-color);
+    border: none;
     font-size: 16px;
     font-weight: 600;
-    color: var(--key-font-color);
-
-    background-color: transparent; 
-    border: none;
 }
 
-.menu div:hover button {
+.menu li:hover button {
     color: var(--key-font-color-low);
 }

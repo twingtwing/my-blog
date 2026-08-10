@@ -1,7 +1,7 @@
 import React from 'react'
 import Header from './components/Header'
 import Home from './pages/home/Home'
-import Recipe from './pages/Recipe'
+import Recipe from './pages/recipe/Recipe'
 import './Style.css'
 
 function App() {

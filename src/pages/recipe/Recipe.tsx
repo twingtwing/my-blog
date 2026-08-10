@@ -1,7 +1,7 @@
 import React from 'react'
 
-import './Recipe.css'
-import { recipeData, recipeCategories } from "../data/recipe";
+import './Recipe.module.css'
+import { recipeData, recipeCategories } from "../../data/recipe";
 
 /* 
     추후에 tree도 커스텀 되도록 변경

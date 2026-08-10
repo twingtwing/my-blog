@@ -16,14 +16,12 @@ Style.css 들어가야하는 값
   --key-color: #466437;
   --key-font-color: #374F2B;
   --key-font-color-low: #BCCFAD;
+
+  --body-width: 1200px;
 }
 
-
-body {
-    height: 100%;
-}
 
 .wrapper {
-    padding: 0 15px;
+    min-height: 100vh;
     /* 양옆에 padding 주고싶은데 반응형이라서 안됨 */
 }

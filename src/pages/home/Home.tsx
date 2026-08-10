@@ -13,35 +13,40 @@ function Home() {
     */
     return (
         <div className={styles.container}>
-            <div className={styles.banner}>
-                <img src={banner} />
+            <section className={styles.banner}>
+                <div>
+                    <img src={banner} />
+                </div>
                 {/* 반응형 헤더 만들기 */}
                 {/* 일반 웹사이트 상단/중단 배너: 1200 x 400px (비율 3:1) */}
-            </div>
-            <div className={styles.contents}>
-                <div className={styles['content-left']}>
-                    <span>content-left</span>
-                </div>
-                <div className={styles['content-right']}>
-                    <div className={styles['card-right']}>
-                        {recipeData.map(recipe => (
-                            <div key={recipe.id} className={styles.card}>
-                                <div className={styles['card-title']}>
-                                    <span>{recipe.title}</span>
-                                </div>
-                                <div className={styles['card-footer']}>
-                                    <div>
-                                        <span>{recipe.category} • {recipe.subCategory}</span>
+            </section>
+            <section className={styles.contents}>
+                <div>
+                    <div className={styles['content-left']}>
+                        <span>content-left</span>
+                    </div>
+                    <div className={styles['content-right']}>
+                        <div className={styles.slide}>
+                            {recipeData.map(recipe => (
+                                <div key={recipe.id} className={styles.card}>
+                                    <div className={styles['card-title']}>
+                                        <span>{recipe.title}</span>
                                     </div>
-                                    <div>
+                                    <div className={styles['card-desc']}>
+                                        <span>{recipe.description}</span>
+                                    </div> 
+                                    <div className={styles['card-footer']}> 
                                         <span>{recipe.calories} kcal</span>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
+                        <div className={styles.next}>
+                            버튼 
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
     )
 }
