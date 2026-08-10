@@ -2,7 +2,11 @@ import styles from './Home.module.css'
 import banner from '../../assets/banner.jpg'
 
 import { recipeData } from "../../data/recipe";
-
+/* 
+    - 반응형 헤더 만들기
+    - 움직이는 텍스트 카드
+        - 카드 형태 컴포넌트화 
+*/
 function Home() {
     /* 
         나중에 자동스크롤되어서 무한 반복되는 텍스트 카드 형태로 교체해야함
