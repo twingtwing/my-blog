@@ -24,3 +24,8 @@ forEach 내부 return은 함수를 종료시키지 못함
 
 ### 타입
 리액트 TSX에서 props 타입을 지정할 때는 interface나 type을 사용해 데이터 구조를 먼저 정의하고 컴포넌트에 적용
+// useRef
+
+// useEffect
+
+// 보니까 컴포넌트를 거의 화살표로 하는거 같은

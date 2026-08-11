@@ -37,28 +37,56 @@
 }
 
 .content-right {
-    flex: 0 0 400px;
+    flex: 0 0 300px;
 }
 
-.card-slide {
-    margin: 0 var(--space-md);
+.carousel {
+    margin: var(--space-sm);
+    padding: 0 var(--space-sm);
 }
 
-.card {
+.viewport {
+    overflow: hidden;
+} 
+
+.slides {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.slide {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
     border-radius: var(--border-radius);
     border: 1px solid var(--key-color);
-
     padding: var(--space-sm);
-    margin: var(--space-sm) 0;
-}
- 
-.card-desc {
-    font-size: 13px;
-    padding-bottom: 5px;
+    margin: 0; /* 오히려 길이가 이상해져서 마진 제거 (gap으로 대체) */
+    height: 70px;
+}   
+
+.carousel button {
+    border-radius: 50%;
+    border: 1px solid var(--key-color-low);
+    background: white;
+    width: 30px;
+    height: 30px;
+    transform: rotate(180deg);
+    cursor: pointer;
 }
 
-.card-footer {
+.carousel button:hover svg path {
+    fill: rgba(20, 20, 20, 0.4);
+} 
+
+.footer {
     display: flex;
     justify-content: flex-end;
     font-size: 13px;
-}   
+}
+.desc {
+    font-size: 12px;
+    padding-bottom: 5px;
+}

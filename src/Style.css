@@ -15,7 +15,7 @@ Style.css 들어가야하는 값
 
   --key-color: #466437;
   --key-font-color: #374F2B;
-  --key-font-color-low: #BCCFAD;
+  --key-color-low: #BCCFAD;
 
   --body-width: 1200px;
 }

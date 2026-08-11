@@ -44,5 +44,5 @@
 }
 
 .menu li:hover button {
-    color: var(--key-font-color-low);
+    color: var(--key-color-low);
 }

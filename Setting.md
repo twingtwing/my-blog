@@ -11,6 +11,7 @@
   - 반응형 UI 적용  
 - [ ] React Router — 페이지 분리 및 확장 (8월 18일 이전까지 무조건 Router 들어가기)
   - [ ] 상세 카테고리 생성 — 카테고리별 / 사용여부...별? 
+- [ ] 여기까지 REcipe하고 복습
 - [ ] Supabase 연동 — CRUD 구현
   - Python..으로 변경..? -> 왜냐면 회사에서 python으로 개발중이므로
   - postgreSql
