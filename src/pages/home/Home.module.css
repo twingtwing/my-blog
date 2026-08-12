@@ -1,13 +1,3 @@
-.container {
-    position: relative;
-
-    /* display: flex;
-    flex-direction: column; 
-    gap: var(--space-sm);
-    padding: var(--space-tiny) 0; */
-
-}
-
 .banner,.contents {
     max-width: var(--body-width);
     margin: 0 auto;
@@ -40,22 +30,9 @@
     flex: 0 0 300px;
 }
 
-.carousel {
-    margin: var(--space-sm);
-    padding: 0 var(--space-sm);
-}
+/* card */
 
-.viewport {
-    overflow: hidden;
-} 
-
-.slides {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-}
-
-.slide {
+.card {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -63,23 +40,8 @@
     border-radius: var(--border-radius);
     border: 1px solid var(--key-color);
     padding: var(--space-sm);
-    margin: 0; /* 오히려 길이가 이상해져서 마진 제거 (gap으로 대체) */
-    height: 70px;
 }   
 
-.carousel button {
-    border-radius: 50%;
-    border: 1px solid var(--key-color-low);
-    background: white;
-    width: 30px;
-    height: 30px;
-    transform: rotate(180deg);
-    cursor: pointer;
-}
-
-.carousel button:hover svg path {
-    fill: rgba(20, 20, 20, 0.4);
-} 
 
 .footer {
     display: flex;

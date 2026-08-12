@@ -29,3 +29,9 @@ forEach 내부 return은 함수를 종료시키지 못함
 // useEffect
 
 // 보니까 컴포넌트를 거의 화살표로 하는거 같은
+
+// 함수 선언식 vs 화살표 함수 컴포넌트
+
+// Generic <T> 를 사용해 데이터 타입을 일반화(Generalize) 하기
+
+//react 클래스 컴포넌트 vs 함수 컴포넌트

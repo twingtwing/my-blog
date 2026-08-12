@@ -38,6 +38,7 @@
 .menu button {
     background-color: transparent; 
     color: var(--key-font-color);
+    cursor: pointer;
     border: none;
     font-size: 16px;
     font-weight: 600;

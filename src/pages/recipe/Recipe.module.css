@@ -17,13 +17,3 @@ Recipe.css에는:
     border: 1px solid var(--key-color);
     padding: 10px 15px;
 }
-
-.recipe-container .tree summary,li {
-    list-style: none;
-    cursor: pointer;
-}
-
-.recipe-container .inner-card {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-}

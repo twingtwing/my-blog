@@ -1,0 +1,9 @@
+.tree summary,li {
+    list-style: none;
+    cursor: pointer;
+}
+
+.inner-card {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}

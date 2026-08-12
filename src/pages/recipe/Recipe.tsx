@@ -1,62 +1,12 @@
 import React from 'react'
+import Tree from '../../components/Tree'
+
 
 import './Recipe.module.css'
 import { recipeData, recipeCategories } from "../../data/recipe";
 
-/* 
-    추후에 tree도 커스텀 되도록 변경
-    계층형 자료로 변경
-*/
-class Tree extends React.Component {
-    
-    renderNode(node){
-        return (
-            <div className='node'>
-                {/* 
-                    icon 트리 형태는 나중에
-                */}
-                <span className="icon">▶ </span>
-                <span onClick={(e) => {
-                    this.props.onClick(node.id)
-                    e.preventDefault();
-                }}>{node.name}</span>
-            </div>
-        );
-    }
-
-    renderTree(categories) {
-        return (
-            categories.map(category => (
-                (category.children && category.children.length > 0) ? (
-                    <details open key={category.id}>
-                        <summary>{this.renderNode(category)}</summary>
-                        <ul>{this.renderTree(category.children)}</ul>
-                    </details>
-                ) : (
-                    <li key={category.id}>{this.renderNode(category)}</li>
-                )
-            ))
-        );
-    }
-
-    render() {  
-        return (
-            <div className='inner-left'>
-                <div className='tree'>
-                    {this.renderTree([{
-                        id: "root",
-                        name: "전체",
-                        order: 1,
-                        children: recipeCategories
-                    }])}
-                </div>
-            </div>
-        )
-    }
-}
 
 class Card extends React.Component {
-    
     searchCard(categories) {
         const categoryId = this.props.categoryId;
         if(categoryId === 'root') return [[{ id: "root", name: "전체"}], recipeData];
@@ -352,7 +302,9 @@ export default class Recipe extends React.Component {
         }
         return (
             <div className='recipe-container'>
-                <Tree onClick = {(id) => this.handleTreeClick(id)} />
+                <div className='inner-left'>
+                    <Tree tree={recipeCategories} onClick = {(id) => this.handleTreeClick(id)} />
+                </div>
                 <div className='inner-right'>{content}</div>
             </div>
         )

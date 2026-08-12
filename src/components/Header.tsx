@@ -7,22 +7,22 @@ interface HeaderProps {
     onClick: (menu: string) => void;
 }
 
-export default function Header(props: HeaderProps) {
+const Header = ({ onClick }: HeaderProps) => {
     return (
         <header className={styles.header}>
             <div className={styles['header-in']}>
                 <div className={styles.top}>
                     <h1 className={styles.logo}>
-                        <a onClick={() => props.onClick('Home')}>
+                        <a onClick={() => onClick('Home')}>
                             <img src={logo} alt='logo'></img>
                         </a>
                     </h1>
                 </div>
                 <nav className={styles.middle}>
                     <ul className={styles.menu}>
-                        {menu.map(m => (
-                            <li key={m}>
-                                <button onClick={() => props.onClick(m)}>{m}</button>
+                        {menu.map(menu => (
+                            <li key={menu}>
+                                <button onClick={() => onClick(menu)}>{menu}</button>
                             </li>
                         ))}
                     </ul>
@@ -31,3 +31,5 @@ export default function Header(props: HeaderProps) {
         </header>
     );
 }
+
+export default Header;

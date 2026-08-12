@@ -876,4 +876,19 @@ export const recipeData: Recipe[] = [
 3. 노릇하게 튀깁니다.
 `,
   },
+  {
+    id: 40,
+    categoryId: "chinese-spring-roll",
+    title: "고기 춘권",
+    calories: 420,
+    description: "고기 소를 춘권피에 말아 바삭하게 튀긴 요리",
+    ingredients: ["춘권피", "양배추", "당근", "숙주", "식용유"],
+    content: `
+## 고기 춘권
+
+1. 고기를 볶아 수분을 제거합니다.
+2. 춘권피에 고기를 넣어 말아줍니다.
+3. 노릇하게 튀깁니다.
+`,
+  },
 ];
