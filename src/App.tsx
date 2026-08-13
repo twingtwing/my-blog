@@ -14,9 +14,10 @@ function App() {
     return (
         <div className='wrapper'>
             <Header onClick={handlerManu}/>
-            {
-                currentPage !== 'Recipe' ? <Home /> : <Recipe />
-            }
+            <main>
+                { currentPage !== 'Recipe' ? <Home /> : <Recipe /> }
+            </main>
+            <footer>footer</footer>
         </div>
     )
 }

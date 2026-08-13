@@ -1,8 +1,7 @@
 import React from 'react'
 import Tree from '../../components/Tree'
+import styles from './Recipe.module.css'
 
-
-import './Recipe.module.css'
 import { recipeData, recipeCategories } from "../../data/recipe";
 
 
@@ -301,7 +300,7 @@ export default class Recipe extends React.Component {
             content = (<div>화면 로딩 중 에러가 발생하였습니다.</div>)
         }
         return (
-            <div className='recipe-container'>
+            <div className={styles.container}>
                 <div className='inner-left'>
                     <Tree tree={recipeCategories} onClick = {(id) => this.handleTreeClick(id)} />
                 </div>

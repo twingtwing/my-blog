@@ -1,9 +1,81 @@
-.tree summary,li {
-    list-style: none;
-    cursor: pointer;
+.tree {
+    /* 넘을 경우..? */
+    font-size: 14px;
 }
 
-.inner-card {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+.tree summary, li{
+    cursor: pointer;
+    list-style: none;
 }
+
+.root {
+    padding-left: 0;
+    margin: 0;
+}
+
+.tree ul:not(.root) {
+    padding-inline-start: 20px;
+}
+
+.item {
+    position: relative;  /* 가상 요소를 배치하기 위해서 relative 설정 */
+}
+
+ul:not(.root) > .item::before {
+    content: '';
+    position: absolute;
+    height: 0;
+    width: 10px;
+    top: 10px;
+    left: -10px;
+    border-top: 1px solid var(--key-color);
+}
+
+/* 여기서 길이를 정하면 안됨 */
+.item:has(details)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 8px;
+    height: calc(100% - 30px);    /* 세로선이 바닥까지 뚫고 나가지 않도록 가로선 높이에서 끊어줌 */
+    bottom: 0;          /* li 높이 전체를 덮도록 설정 */
+    border-left: 1px solid var(--key-color);
+} 
+
+.node {
+    display: flex;
+    align-items: center;
+    gap: var(--space-tiny);
+    height: 20px;        /* 연결선 중앙 정렬 계산을 위해  고정 */
+    user-select: none;      /* 빠른 연속 클릭 시 카테고리 이름이 파랗게 블록 지정되는 현상 방지 */
+}
+
+.icon {
+    display: inline-flex; /* 이상태에서  display none하니까 괜찮아 둘다 block이면 이상하게 보이는데 말이지 */
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    color: var(--key-color);
+}
+
+details[open] > summary .open {
+    display: block;
+}
+
+details[open] > summary .close {
+    display: none;
+}
+
+details:not([open]) > summary .open {
+    display: none;
+}
+
+details:not([open]) > summary .close {
+    display: block;
+}
+
+/* 
+추가사항 접었다 펼치기 자연스럽게
+선 좀 정교하게 선끝에 동그라미 추가
+*/

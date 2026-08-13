@@ -6,7 +6,11 @@ Recipe.css에는:
 레시피 카드 스타일
 */
 
-.recipe-container {
+/* 크기 고정으로 하기 */
+.container {
+    max-width: var(--body-width);
+    margin: 0 auto;
+
     display: grid;
     grid-template-columns: 3fr 7fr;
     gap: var(--space-sm);
@@ -17,3 +21,4 @@ Recipe.css에는:
     border: 1px solid var(--key-color);
     padding: 10px 15px;
 }
+
