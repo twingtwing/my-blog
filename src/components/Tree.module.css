@@ -24,23 +24,31 @@
 ul:not(.root) > .item::before {
     content: '';
     position: absolute;
-    height: 0;
-    width: 10px;
     top: 10px;
-    left: -10px;
+    left: -12px;
+    width: 12px;
+    height: 0;
     border-top: 1px solid var(--key-color);
 }
 
-/* 여기서 길이를 정하면 안됨 */
-.item:has(details)::after {
+/* 자식의 세로선을 부모가 사용하도록함 */
+ul:not(.root) > .item::after {
     content: '';
     position: absolute;
-    top: 20px;
-    left: 8px;
-    height: calc(100% - 30px);    /* 세로선이 바닥까지 뚫고 나가지 않도록 가로선 높이에서 끊어줌 */
-    bottom: 0;          /* li 높이 전체를 덮도록 설정 */
+    top: 0;
+    left: -12px;
+    width: 0;
+    height: 100%;        /* 다음 형제 노드와 이어지도록 바닥까지 연장 */
     border-left: 1px solid var(--key-color);
-} 
+}
+
+/* 마지막 자식은 세로선이 아래로 더 뚫고 나가지 않고 가로선 위치(10px)에서 멈춥니다.
+    세로선이 top 0에서 시작해서 가능
+    그렇기 때문에 node 1/2 정도만 추가하면 말끔한 새로선이 발생
+*/
+ul:not(.root) > .item:last-child::after {
+    height: 10px;        /* top: 0부터 가로선 위치인 10px까지만 세로선 생성 ('└' 모양 완성) */
+}
 
 .node {
     display: flex;
@@ -62,17 +70,31 @@ ul:not(.root) > .item::before {
 details[open] > summary .open {
     display: block;
 }
-
 details[open] > summary .close {
     display: none;
 }
-
 details:not([open]) > summary .open {
     display: none;
 }
-
 details:not([open]) > summary .close {
     display: block;
+}
+
+.accordion {
+    display: grid;
+    grid-template-rows: 0fr;   /* 닫혔을 때 높이 0 */
+    transition: grid-template-rows 2s ease-in-out;
+}
+
+/* details가 open 상태일 때 그리드 높이를 1fr로 변경 */
+details[open] > .accordion {
+    grid-template-rows: 1fr;   /* 펼쳐졌을 때 전체 높이 */
+}
+
+/* 자식 ul이 접힐 때 내용물이 넘치지 않도록 방지 */
+.accordion > ul {
+    min-height: 0;
+    overflow: hidden;
 }
 
 /* 

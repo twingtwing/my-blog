@@ -201,4 +201,6 @@ detail surmmary해서tree..?
   object-fit: cover;        /* 비율을 유지하며 영역을 꽉 채우고 남는 부분 잘라내기 */
   object-position: center;   /* 중앙을 기준으로 크롭 (기본값이 center입니다) */
 }
-```
+
+
+#### transition

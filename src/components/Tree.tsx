@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styles from './Tree.module.css'
 
 /* 
@@ -17,15 +18,14 @@ interface TreeProps {
     onClick: (id : string) =>  void;
 }
 
-const FolderIcon = () => (
-    <span className={styles.icon}>
-        <svg className={styles.close} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-            <path fill="currentColor" d="M64 448l384 0c35.3 0 64-28.7 64-64l0-240c0-35.3-28.7-64-64-64L298.7 80c-6.9 0-13.7-2.2-19.2-6.4L241.1 44.8C230 36.5 216.5 32 202.7 32L64 32C28.7 32 0 60.7 0 96L0 384c0 35.3 28.7 64 64 64z"/>
-        </svg>
-        <svg className={styles.open} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
-            <path fill="currentColor" d="M56 225.6L32.4 296.2 32.4 96c0-35.3 28.7-64 64-64l138.7 0c13.8 0 27.3 4.5 38.4 12.8l38.4 28.8c5.5 4.2 12.3 6.4 19.2 6.4l117.3 0c35.3 0 64 28.7 64 64l0 16-365.4 0c-41.3 0-78 26.4-91.1 65.6zM477.8 448L99 448c-32.8 0-55.9-32.1-45.5-63.2l48-144C108 221.2 126.4 208 147 208l378.8 0c32.8 0 55.9 32.1 45.5 63.2l-48 144c-6.5 19.6-24.9 32.8-45.5 32.8z"/>
-        </svg>
-    </span>
+const FolderIcon = (isOpen: {isOpen: boolean}) => (
+    !isOpen ?
+    <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <path fill="currentColor" d="M64 448l384 0c35.3 0 64-28.7 64-64l0-240c0-35.3-28.7-64-64-64L298.7 80c-6.9 0-13.7-2.2-19.2-6.4L241.1 44.8C230 36.5 216.5 32 202.7 32L64 32C28.7 32 0 60.7 0 96L0 384c0 35.3 28.7 64 64 64z"/>
+    </svg> :
+    <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+        <path fill="currentColor" d="M56 225.6L32.4 296.2 32.4 96c0-35.3 28.7-64 64-64l138.7 0c13.8 0 27.3 4.5 38.4 12.8l38.4 28.8c5.5 4.2 12.3 6.4 19.2 6.4l117.3 0c35.3 0 64 28.7 64 64l0 16-365.4 0c-41.3 0-78 26.4-91.1 65.6zM477.8 448L99 448c-32.8 0-55.9-32.1-45.5-63.2l48-144C108 221.2 126.4 208 147 208l378.8 0c32.8 0 55.9 32.1 45.5 63.2l-48 144c-6.5 19.6-24.9 32.8-45.5 32.8z"/>
+    </svg>
 );
 
 const FileIcon = () => (
@@ -36,12 +36,35 @@ const FileIcon = () => (
     </span>
 );
 
+/* 
+    details로는 애니메이션을 구현할 수 없기 때문에 useState로 변경
+*/
+
 const Tree = ({tree, onClick} : TreeProps) => {
 
+    const [openNodes, setOpenNodes] = useState<Set<string>>(
+        () => new Set(['root'])
+    );
+
+    const clickNode = (id: string) => {
+        setOpenNodes(prev => {
+            const next = new Set(prev);
+
+            if(next.has(id)){
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
+
+            return next;
+        });
+    }
+
     const renderNode = (node: Node, hasChildren: boolean) => {
+        const isOpen = openNodes.has(node.id);
         return (
             <div className={styles.node}>
-                {hasChildren ? <FolderIcon /> : <FileIcon />} 
+                {hasChildren ? <FolderIcon isOpen={isOpen}/> : <FileIcon />} 
                 <span
                     className={styles.label}
                     onClick={(e) => {
@@ -54,18 +77,33 @@ const Tree = ({tree, onClick} : TreeProps) => {
         )
     }
 
+    const renderAccordion = (node: Node) => {
+        const isOpen = openNodes.has(node.id);
+        return (
+            <div>
+                <button
+                    type='button'
+                    aria-expanded = {isOpen}
+                    onClick={() => clickNode(node.id)}
+                >
+                    {renderNode(node, true)}
+                </button>
+                <div className={styles.accordion}>
+                    <ul>{renderTree(node.children)}</ul>
+                </div>
+            </div>
+        )
+    }
+
     const renderTree = (nodes: Node[]) => {
         // 오름차순 정렬
-        const sortedNode = nodes.sort((a,b) =>a.order - b.order);
+        const sortedNode = [...nodes].sort((a,b) =>a.order - b.order); // 원본배열을 변형하지 않도록 얇은 복사
         return (
             sortedNode.map(node => (
                 // HTML 표준에 맞게 <ul> 태그 안에는 항상 <li>만 위치하도록 통일
                 <li key={node.id} className={styles.item} >
                     {(node.children && node.children.length > 0) ? (
-                        <details open>
-                            <summary>{renderNode(node, true)}</summary>
-                            <ul>{renderTree(node.children)}</ul>
-                        </details>
+                        renderAccordion(node)
                     ) : (
                         renderNode(node, false)
                     )}
