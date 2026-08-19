@@ -1,11 +1,20 @@
 .tree {
-    /* 넘을 경우..? */
-    font-size: 14px;
-}
+    --tree-color: var(--key-color);
+    
+    /* 노드 한 줄의 높이와 연결선 중심 위치를 한곳에서 관리한다. */
+    --node-height: 20px;
+    --node-center-y: calc(var(--node-height) / 2);
 
-.tree summary, li{
-    cursor: pointer;
-    list-style: none;
+    --icon-length: 16px;
+    --line-left: calc(var(--icon-length) / -2 - var(--space-tiny));
+    /* 가로선의 시작점과 길이를 더해 가로선 끝(점의 중심) 좌표를 계산한다. */
+    --line-end-x: calc(var(--line-left) + var(--node-center-y));
+    --circle-end-x: calc(var(--line-left) + var(--node-center-y) - 2px);
+
+    font-size: 14px;
+
+    /* 트리 깊이와 이름이 영역보다 길면 가로 스크롤을 제공한다. */
+    overflow-x: auto;
 }
 
 .root {
@@ -14,7 +23,34 @@
 }
 
 .tree ul:not(.root) {
-    padding-inline-start: 20px;
+    padding-inline-start: var(--node-height);
+}
+
+.node {
+    display: flex; /* Flex 자식에는 기본적으로 flex-shrink: 1이 적용됩니다. 공간이 부족해지면 브라우저가 아이콘을 16px보다 작게 축소할 수 */
+    align-items: center;
+    gap: var(--space-tiny);
+    height: var(--node-height);        /* 연결선 중앙 정렬 계산을 위해  고정 */
+    user-select: none;      /* 빠른 연속 클릭 시 카테고리 이름이 파랗게 블록 지정되는 현상 방지 */
+}
+
+.icon {
+    display: flex;
+    flex: 0 0 var(--icon-length); /* grow 0, shrink 0, 기본 크기 16px 아이콘 크기 고정 */
+    color: var(--tree-color);
+}
+
+.icon > svg {
+    align-items: center;
+    justify-content: center;
+}
+
+button[aria-expanded=false] .icon {
+    flex: 0 0 calc(var(--icon-length) - 2px); 
+}
+
+.label {
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
 }
 
 .item {
@@ -24,11 +60,17 @@
 ul:not(.root) > .item::before {
     content: '';
     position: absolute;
-    top: 10px;
-    left: -12px;
-    width: 12px;
-    height: 0;
-    border-top: 1px solid var(--key-color);
+    top: var(--node-center-y);
+    left: var(--line-left);
+    width: var(--node-center-y);
+    /* 
+    선을 원의 중앙에 맞추기 위해 좌표 지정 방식을 일치시킴
+    가로선을 border-top 대신 height: 1px 배경으로 변경 
+    top을 선의 위쪽이 아니라 중심 좌표로 사용해 점의 세로 중심과 일치시킨다. 
+    */
+    height: 1px; 
+    transform: translateY(-50%);
+    background-color: var(--tree-color);
 }
 
 /* 자식의 세로선을 부모가 사용하도록함 */
@@ -36,10 +78,15 @@ ul:not(.root) > .item::after {
     content: '';
     position: absolute;
     top: 0;
-    left: -12px;
-    width: 0;
+    left: var(--line-left);
+    width: 1px;
     height: 100%;        /* 다음 형제 노드와 이어지도록 바닥까지 연장 */
-    border-left: 1px solid var(--key-color);
+    /*
+        left를 세로선의 왼쪽이 아니라 중심 좌표로 사용한다.
+        원도 동일한 좌표를 사용하므로 두 중심이 일치한다.
+    */
+    transform: translateX(-50%);
+    background-color: var(--tree-color);
 }
 
 /* 마지막 자식은 세로선이 아래로 더 뚫고 나가지 않고 가로선 위치(10px)에서 멈춥니다.
@@ -47,57 +94,86 @@ ul:not(.root) > .item::after {
     그렇기 때문에 node 1/2 정도만 추가하면 말끔한 새로선이 발생
 */
 ul:not(.root) > .item:last-child::after {
-    height: 10px;        /* top: 0부터 가로선 위치인 10px까지만 세로선 생성 ('└' 모양 완성) */
+    height: var(--node-center-y);   /* top: 0부터 가로선 위치인 10px까지만 세로선 생성 ('└' 모양 완성) */
 }
 
-.node {
-    display: flex;
-    align-items: center;
-    gap: var(--space-tiny);
-    height: 20px;        /* 연결선 중앙 정렬 계산을 위해  고정 */
-    user-select: none;      /* 빠른 연속 클릭 시 카테고리 이름이 파랗게 블록 지정되는 현상 방지 */
+.item-inner {
+    position: relative;
 }
 
-.icon {
-    display: inline-flex; /* 이상태에서  display none하니까 괜찮아 둘다 block이면 이상하게 보이는데 말이지 */
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    color: var(--key-color);
+ul:not(.root) .item-inner::before {
+    content: '';
+    position: absolute;
+    /* 하드 코딩한 값 대신 실제 가로선 끝 좌표를 원의 중심으로 사용한다. */
+    left: calc(var(--circle-end-x));
+    top: var(--node-center-y);
+    /*
+        left와 top을 점의 왼쪽 위가 아닌 점의 중심으로 사용한다.
+        점 크기가 바뀌어도 별도로 절반을 다시 계산할 필요가 없다.
+    */
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--tree-color);
+    z-index: 1;
 }
 
-details[open] > summary .open {
-    display: block;
-}
-details[open] > summary .close {
-    display: none;
-}
-details:not([open]) > summary .open {
-    display: none;
-}
-details:not([open]) > summary .close {
-    display: block;
+
+ul:not(.root) > .item:first-child > .item-inner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: var(--line-left);
+    /*
+        left/top 위치가 원의 중심이 되도록
+        원 크기의 절반만큼 이동한다.
+    */
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--tree-color);
+    z-index: 1;
 }
 
 .accordion {
+    /*
+        자식 <ul>의 높이는 노드 개수에 따라 달라지므로 고정된 height 값을 사용할 수 없다.
+        Grid 행을 사용하면 실제 콘텐츠 높이를 유지하면서 0fr과 1fr 사이를 전환할 수 있다.
+    */
     display: grid;
-    grid-template-rows: 0fr;   /* 닫혔을 때 높이 0 */
-    transition: grid-template-rows 2s ease-in-out;
+    grid-template-rows: 0fr; /* 닫힌 상태: 자식 <ul>이 들어 있는 Grid 행의 높이를 0으로 줄인다. */
+    /* 열림/닫힘 시 행 높이와 투명도가 즉시 바뀌지 않고 250ms 동안 변하도록 한다.(ease-in-out : 시작과 끝은 느리고 중간은 보통 변화) */
+    transition:
+        grid-template-rows 250ms ease-in-out,
+        opacity 250ms ease-in-out;
 }
 
-/* details가 open 상태일 때 그리드 높이를 1fr로 변경 */
-details[open] > .accordion {
-    grid-template-rows: 1fr;   /* 펼쳐졌을 때 전체 높이 */
+.accordion.open {
+    grid-template-rows: 1fr; /* 열린 상태: 자식 콘텐츠에 필요한 만큼 Grid 행을 펼친다. */
+    opacity: 1; /* 펼쳐진 내용을 완전히 보이게 한다. */
 }
 
-/* 자식 ul이 접힐 때 내용물이 넘치지 않도록 방지 */
 .accordion > ul {
+    /*
+        Grid 아이템의 기본 최소 높이 때문에 0fr 상태에서도 내용 높이가 남을 수 있다.
+        부모 행을 따라 높이 0까지 줄어들 수 있도록 최소 높이를 제거한다.
+    */
     min-height: 0;
-    overflow: hidden;
+    overflow: hidden; /* 접히는 동안 줄어든 영역 밖으로 글자와 연결선이 노출되지 않도록 숨긴다. */
+}
+ 
+
+
+.tree summary, li{
+    cursor: pointer;
+    list-style: none;
 }
 
-/* 
-추가사항 접었다 펼치기 자연스럽게
-선 좀 정교하게 선끝에 동그라미 추가
-*/
+.tree button {
+    background-color: transparent; 
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
