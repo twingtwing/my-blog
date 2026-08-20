@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styles from './Tree.module.css'
 
 /* 
@@ -71,9 +71,13 @@ const Tree = ({tree, onClick} : TreeProps) => {
                 {hasChildren ? <FolderIcon isOpen={isOpen}/> : <FileIcon />} 
                 <span
                     className={styles.label}
+                    /* 
+                        이때, 부모로부터의 이벤트 전파를 막기위해서 
+                        preventDefault 대신 stopPropagation을 사용함
+                    */
                     onClick={(e) => {
+                        e.stopPropagation();
                         onClick(node.id)
-                        e.preventDefault();
                 }}>
                     {node.name}
                 </span>

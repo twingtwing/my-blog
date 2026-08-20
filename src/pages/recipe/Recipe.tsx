@@ -1,9 +1,8 @@
-import React from 'react'
+import { useState } from 'react'
 import Tree from '../../components/Tree'
 import styles from './Recipe.module.css'
 
-import { recipeData, recipeCategories } from "../../data/recipe";
-
+import { recipeCategories, recipeData, type RecipeCategory } from "../../data/recipe";
 
 // class Card extends React.Component {
 //     searchCard(categories) {
@@ -221,12 +220,61 @@ import { recipeData, recipeCategories } from "../../data/recipe";
 //         );
 //     }
 // }
+ 
+  
+
+const findCategories = (id: string, categories: RecipeCategory[]):string[] => {
+    if(id === 'root') {
+        return categories.flatMap(category => 
+            category.children.length > 0 ? [category.id, ...findCategories('root', category.children)] : [category.id]
+        )
+    }
+
+    for(const category of categories) {
+        if(id === category.id)
+            return [category.id, ...findCategories('root', category.children)]
+
+        const children = findCategories(id, category.children)
+        if(children.length > 0) return children;
+    }
+
+    return [];
+}
 
 
 const Recipe = () => {
+
+    const [recipeCartegroy, setRecipeCartegroy] = useState('root');
+
+    const handleClick = (id: string) => {
+        setRecipeCartegroy(id);
+    }
+
+    const renderCards = (id: string) => {
+        const categories = findCategories(id, recipeCategories);
+        return (
+            <div>
+                {recipeData
+                    .filter(recipe => categories.includes(recipe.categoryId))
+                    .map(recipe => (
+                        <div key={recipe.id}>
+                            {recipe.title}
+                        </div>
+                ))}
+            </div>
+        )
+    }
+
     return (
         <div className={styles.container}>
-            <div className={styles['inner']}
+            <div className={styles.contents}>
+                <div className={styles.left}>
+                    <Tree tree={recipeCategories} onClick={(id) => handleClick(id)} />
+                </div>
+                <div className={styles.right}>
+                    {renderCards(recipeCartegroy)}
+                </div>
+            </div>
         </div>
     )
 }

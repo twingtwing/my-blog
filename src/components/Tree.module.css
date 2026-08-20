@@ -2,19 +2,16 @@
     --tree-color: var(--key-color);
     
     /* 노드 한 줄의 높이와 연결선 중심 위치를 한곳에서 관리한다. */
-    --node-height: 20px;
+    --node-height: 24px;
     --node-center-y: calc(var(--node-height) / 2);
 
-    --icon-length: 16px;
+    --icon-length: 18px;
     --line-left: calc(var(--icon-length) / -2 - var(--space-tiny));
     /* 가로선의 시작점과 길이를 더해 가로선 끝(점의 중심) 좌표를 계산한다. */
     --line-end-x: calc(var(--line-left) + var(--node-center-y));
     --circle-end-x: calc(var(--line-left) + var(--node-center-y) - 2px);
 
-    font-size: 14px;
-
-    /* 트리 깊이와 이름이 영역보다 길면 가로 스크롤을 제공한다. */
-    overflow-x: auto;
+    --font-size: 14px;
 }
 
 .root {
@@ -46,10 +43,11 @@
 }
 
 button[aria-expanded=false] .icon {
-    flex: 0 0 calc(var(--icon-length) - 2px); 
+    flex: 0 0 calc(var(--icon-length) - 3px); 
 }
 
 .label {
+    font-size: var(--font-size);
     white-space: nowrap; /* 텍스트 줄바꿈 방지 */
 }
 

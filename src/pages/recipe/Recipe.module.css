@@ -5,18 +5,25 @@ Recipe.css에는:
 레시피 그리드
 레시피 카드 스타일
 */
-
-/* 크기 고정으로 하기 */
 .container {
     max-width: var(--body-width);
     margin: 0 auto;
 
-    display: grid;
-    grid-template-columns: 3fr 7fr;
-    gap: var(--space-sm);
 }
 
-.recipe-container .inner-left,.inner-right {
+/* 
+트리 & 카드 형태 반응형으로 고치기 나중에
+*/
+.contents {
+    display: grid;
+    grid-template-columns: fit-content(350px) 1fr;
+    gap: var(--space-md);
+    min-height: 900px;
+    padding: var(--space-sm) var(--space-md);
+}
+
+
+.left,.right {
     border-radius: 8px;
     border: 1px solid var(--key-color);
     padding: 10px 15px;
