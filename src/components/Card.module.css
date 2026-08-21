@@ -1,0 +1,9 @@
+.card {
+    border: 1px solid var(--key-color);
+    border-radius: 8px;
+    min-height: 180px;
+}
+
+.card.recipe {
+    width: 200px;
+}

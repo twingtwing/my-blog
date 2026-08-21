@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Tree from '../../components/Tree'
+import Card from '../../components/Card'
 import styles from './Recipe.module.css'
 
 import { recipeCategories, recipeData, type RecipeCategory } from "../../data/recipe";
@@ -220,48 +221,63 @@ import { recipeCategories, recipeData, type RecipeCategory } from "../../data/re
 //         );
 //     }
 // }
- 
-  
+ /* 
+    backend할때 데이터 처리하는 방법 바꾸기
+ */
 
-const findCategories = (id: string, categories: RecipeCategory[]):string[] => {
-    if(id === 'root') {
-        return categories.flatMap(category => 
-            category.children.length > 0 ? [category.id, ...findCategories('root', category.children)] : [category.id]
-        )
+
+const getCategory = (id: string, categories: RecipeCategory[]):RecipeCategory => {
+    if(id === 'root' || !categories) {
+        return {
+            id: 'root',
+            name: '전체',
+            order: 1,
+            children: recipeCategories
+        }
     }
 
-    for(const category of categories) {
+    for(const category of categories){
         if(id === category.id)
-            return [category.id, ...findCategories('root', category.children)]
+            return category
 
-        const children = findCategories(id, category.children)
-        if(children.length > 0) return children;
+        const children = getCategory(id, category.children)
+        if(children.id !== 'error') return children;
     }
 
-    return [];
-}
+    return {
+            id: 'error',
+            name: '잘못된 경로입니다. 관리자에게 확인해주세요.',
+            order: 0,
+            children: []
+        };
 
+} 
+
+const findCategories = (categories: RecipeCategory[]):string[] => {
+    return categories.flatMap(category => 
+        category.children && category.children.length > 0 ? [category.id, ...findCategories(category.children)] : [category.id]
+    )
+}
 
 const Recipe = () => {
 
-    const [recipeCartegroy, setRecipeCartegroy] = useState('root');
+    const [recipeCartegroy, setRecipeCartegroy] = useState(getCategory('root', recipeCategories));
 
     const handleClick = (id: string) => {
-        setRecipeCartegroy(id);
+        const category = getCategory(id, recipeCategories);
+        setRecipeCartegroy(category);
     }
 
-    const renderCards = (id: string) => {
-        const categories = findCategories(id, recipeCategories);
+    const renderCards = (category: RecipeCategory) => {
+        if(category.id === 'error') return <div>{category.name}</div>
+        const categories = findCategories([category]);
+
         return (
-            <div>
-                {recipeData
-                    .filter(recipe => categories.includes(recipe.categoryId))
-                    .map(recipe => (
-                        <div key={recipe.id}>
-                            {recipe.title}
-                        </div>
-                ))}
-            </div>
+            recipeData
+                .filter(recipe => categories.includes(recipe.categoryId))
+                .map(recipe => (
+                    <Card key={recipe.id} card={recipe} className={'recipe'}/>
+            ))
         )
     }
 
@@ -269,10 +285,31 @@ const Recipe = () => {
         <div className={styles.container}>
             <div className={styles.contents}>
                 <div className={styles.left}>
+                    <div className={styles.title}>
+                        <span>Recipe</span>
+                    </div>
                     <Tree tree={recipeCategories} onClick={(id) => handleClick(id)} />
                 </div>
                 <div className={styles.right}>
-                    {renderCards(recipeCartegroy)}
+                    <div className={styles.title}>
+                        <span>
+                            {recipeCartegroy.name} 레시피
+                        </span>
+                    </div>
+                    <hr />
+                    <div className={styles.filter}>
+                        <div>
+                            <span>
+                                전체 갯수
+                            </span>
+                            <span>
+                                필터
+                            </span>
+                        </div>
+                    </div>
+                    <div className={styles.cards}>
+                        {renderCards(recipeCartegroy)}
+                    </div>
                 </div>
             </div>
         </div>

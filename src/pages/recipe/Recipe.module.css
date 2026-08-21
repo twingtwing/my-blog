@@ -17,15 +17,39 @@ Recipe.css에는:
 .contents {
     display: grid;
     grid-template-columns: fit-content(350px) 1fr;
-    gap: var(--space-md);
+    gap: var(--space-lg);
     min-height: 900px;
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-md);
 }
 
 
-.left,.right {
+.left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);    
+
     border-radius: 8px;
     border: 1px solid var(--key-color);
-    padding: 10px 15px;
+    padding: 10px 15px 15px;
 }
 
+
+.title {
+    font-weight: 500;
+}
+
+.right .title {
+    font-size: 20px;
+}
+
+.filter {
+    display: flex;
+    justify-content: end;
+    font-size: 14px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min-content, auto));;
+    padding: var(--space-md);
+}
