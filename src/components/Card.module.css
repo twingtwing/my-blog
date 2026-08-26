@@ -1,9 +1,22 @@
 .card {
+    --card-width: 200px;
+    display: flex;
+    flex-direction: column;
     border: 1px solid var(--key-color);
     border-radius: 8px;
-    min-height: 180px;
 }
 
 .card.recipe {
-    width: 200px;
+    height: calc(var(--card-width) / 16 * 9); /* 16 : 9 */
+    width: var(--card-width);
 }
+
+.inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-sm); 
+    height: 100%;
+}
+
+

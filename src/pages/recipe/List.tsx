@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Tree from '../../components/Tree'
+
 import Card from '../../components/Card'
 import styles from './Recipe.module.css'
 
@@ -224,8 +224,6 @@ import { recipeCategories, recipeData, type RecipeCategory } from "../../data/re
  /* 
     backend할때 데이터 처리하는 방법 바꾸기
  */
-
-
 const getCategory = (id: string, categories: RecipeCategory[]):RecipeCategory => {
     if(id === 'root' || !categories) {
         return {
@@ -259,13 +257,16 @@ const findCategories = (categories: RecipeCategory[]):string[] => {
     )
 }
 
-const Recipe = () => {
-
+export const List = () => {
     const [recipeCartegroy, setRecipeCartegroy] = useState(getCategory('root', recipeCategories));
 
-    const handleClick = (id: string) => {
+    const handleTreeClick = (id: string) => {
         const category = getCategory(id, recipeCategories);
         setRecipeCartegroy(category);
+    }
+
+    const handleCardClick = (id:string) => {
+
     }
 
     const renderCards = (category: RecipeCategory) => {
@@ -276,47 +277,41 @@ const Recipe = () => {
             recipeData
                 .filter(recipe => categories.includes(recipe.categoryId))
                 .map(recipe => (
-                    <Card key={recipe.id} card={recipe} className={'recipe'}/>
+                    <Card 
+                        key={recipe.id} 
+                        card={recipe} 
+                        className={'recipe'} 
+                        onClick={() => handleCardClick(recipe.id)}/>
             ))
         )
     }
 
     return (
-        <div className={styles.container}>
-            <div className={styles.contents}>
-                <div className={styles.left}>
-                    <div className={styles.title}>
-                        <span>Recipe</span>
-                    </div>
-                    <Tree tree={recipeCategories} onClick={(id) => handleClick(id)} />
+        <>
+            <div className={styles.title}>
+                <span>
+                    {recipeCartegroy.name} 레시피
+                </span>
+            </div>
+            <hr />
+            <div className={styles.option}>
+                <div>
+                    <span>
+                        전체 10개
+                    </span>
                 </div>
-                <div className={styles.right}>
-                    <div className={styles.title}>
-                        <span>
-                            {recipeCartegroy.name} 레시피
-                        </span>
-                    </div>
-                    <hr />
-                    <div className={styles.filter}>
-                        <div>
-                            <span>
-                                전체 갯수
-                            </span>
-                            <span>
-                                필터
-                            </span>
-                        </div>
-                    </div>
-                    <div className={styles.cards}>
-                        {renderCards(recipeCartegroy)}
-                    </div>
+                <div className={styles.filter}>
+                    <span>
+                        필터
+                    </span>
                 </div>
             </div>
-        </div>
+            <div className={styles.cards}>
+                {renderCards(recipeCartegroy)}
+            </div>
+        </>
     )
 }
-
-export default Recipe;
 
 // export default class Recipe extends React.Component {
 //     constructor(props){

@@ -33,17 +33,16 @@
 
 .icon {
     display: flex;
-    flex: 0 0 var(--icon-length); /* grow 0, shrink 0, 기본 크기 16px 아이콘 크기 고정 */
     color: var(--tree-color);
 }
 
 .icon > svg {
     align-items: center;
     justify-content: center;
-}
+} 
 
 button[aria-expanded=false] .icon {
-    flex: 0 0 calc(var(--icon-length) - 3px); 
+    width: calc(var(--icon-length) - 3px); 
 }
 
 .label {

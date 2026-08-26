@@ -19,9 +19,8 @@ Recipe.css에는:
     grid-template-columns: fit-content(350px) 1fr;
     gap: var(--space-lg);
     min-height: 900px;
-    padding: var(--space-md);
+    padding: var(--space-lg) var(--space-md);
 }
-
 
 .left {
     display: flex;
@@ -33,23 +32,6 @@ Recipe.css에는:
     padding: 10px 15px 15px;
 }
 
-
 .title {
     font-weight: 500;
-}
-
-.right .title {
-    font-size: 20px;
-}
-
-.filter {
-    display: flex;
-    justify-content: end;
-    font-size: 14px;
-}
-
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min-content, auto));;
-    padding: var(--space-md);
 }

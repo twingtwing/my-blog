@@ -35,8 +35,7 @@
     padding: var(--space-sm);
 }
 
-.menu button {
-    background-color: transparent; 
+.menu a {
     color: var(--key-font-color);
     cursor: pointer;
     border: none;
@@ -44,6 +43,6 @@
     font-weight: 600;
 }
 
-.menu li:hover button {
+.menu li:hover a {
     color: var(--key-color-low);
 }

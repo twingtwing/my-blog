@@ -1,0 +1,25 @@
+.title {
+    font-size: 20px;
+}
+
+.option {
+    display: flex;
+    justify-content: end;
+    font-size: 14px;
+}
+
+.option > div {
+    margin-right: var(--space-sm);
+}
+
+.filter {
+    
+}
+
+.cards {
+    display: grid;
+    justify-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(200px, auto));
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+}
