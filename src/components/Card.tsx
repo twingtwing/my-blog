@@ -1,13 +1,15 @@
+import type { MouseEventHandler } from 'react';
 import styles from './Card.module.css'
 
 type CardPorps = {
     card: any;
     className?: string;
+    onClick?: MouseEventHandler<HTMLDivElement>;
 }
 
-const Card = ({card, className} : CardPorps) => {
+const Card = ({card, className, onClick} : CardPorps) => {
     return (
-        <div className={`${styles.card} ${className ? styles[className] : ''}`}>
+        <div className={`${styles.card} ${className ? styles[className] : ''}`} onClick={onClick}>
             <div className={styles.inner}>
                 <div className={styles.contents}>
                     <div className={styles.top}>
